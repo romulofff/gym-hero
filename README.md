@@ -1,2 +1,3 @@
-# gh-pygame
-Creating a Guitar Hero clone using PyGame
+# Guitar Hero Clone - PyGame
+### Guitar Hero Clone created using PyGame
+
