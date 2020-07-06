@@ -48,18 +48,24 @@ def update_radius(old_radius):
 
 def draw_note_target():
     """Draws the note target at the end of the track"""
+    target_y = 260
+    target_outer_radius = 30
+    target_inner_radius = 15
+
+    gray = (55, 55, 55)
+
     # Outer (colored) Circle
-    draw.circle(screen, (0, 255, 0), (64, 260), 30)
-    draw.circle(screen, (255, 0, 0), (132, 260), 30)
-    draw.circle(screen, (255, 255, 0), (200, 260), 30)
-    draw.circle(screen, (0, 0, 255), (268, 260), 30)
-    draw.circle(screen, (255, 128, 0), (336, 260), 30)
+    draw.circle(screen, (0, 255, 0), (64, target_y), target_outer_radius)
+    draw.circle(screen, (255, 0, 0), (132, target_y), target_outer_radius)
+    draw.circle(screen, (255, 255, 0), (200, target_y), target_outer_radius)
+    draw.circle(screen, (0, 0, 255), (268, target_y), target_outer_radius)
+    draw.circle(screen, (255, 128, 0), (336, target_y), target_outer_radius)
     # Inner Circle
-    draw.circle(screen, (55, 55, 55), (64, 260), 15)
-    draw.circle(screen, (55, 55, 55), (132, 260), 15)
-    draw.circle(screen, (55, 55, 55), (200, 260), 15)
-    draw.circle(screen, (55, 55, 55), (268, 260), 15)
-    draw.circle(screen, (55, 55, 55), (336, 260), 15)
+    draw.circle(screen, gray, (64, target_y), target_inner_radius)
+    draw.circle(screen, gray, (132, target_y), target_inner_radius)
+    draw.circle(screen, gray, (200, target_y), target_inner_radius)
+    draw.circle(screen, gray, (268, target_y), target_inner_radius)
+    draw.circle(screen, gray, (336, target_y), target_inner_radius)
 
 
 def handle_event(event_obj, score):
@@ -67,22 +73,24 @@ def handle_event(event_obj, score):
     if event_obj.type == pygame.KEYDOWN:
         # print(event_obj)
         if event_obj.key == 27:
+            print("Bye!")
             quit()
 
         if event_obj.unicode == 'a':
             return update_score(score)
     return score
 
+
 def update_score(score):
     """ Increases score points by 10 """
-    print("Pontuação antes: {}".format(score))
     score += 10
-    print("Pontuação depois: {}".format(score))
     return score
 
 
 font_name = pygame.font.match_font('arial')
-def draw_score(screen, score_points, size):
+
+
+def draw_score(score_screen, score_points, size):
     """ Draws score points on the screen """
     _x = 360
     _y = 50
@@ -90,7 +98,7 @@ def draw_score(screen, score_points, size):
     text_surface = font.render(score_points, True, white)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (_x, _y)
-    screen.blit(text_surface, text_rect)
+    score_screen.blit(text_surface, text_rect)
 
 
 if __name__ == "__main__":
