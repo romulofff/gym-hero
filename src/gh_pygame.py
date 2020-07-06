@@ -62,7 +62,7 @@ def draw_note_target():
     draw.circle(screen, (55, 55, 55), (336, 260), 15)
 
 
-def handle_event(event_obj):
+def handle_event(event_obj, score):
     """ Handles an event """
     if event_obj.type == pygame.KEYDOWN:
         # print(event_obj)
@@ -70,24 +70,46 @@ def handle_event(event_obj):
             quit()
 
         if event_obj.unicode == 'a':
-            action = ''
-    return 'action'
+            return update_score(score)
+    return score
+
+def update_score(score):
+    """ Increases score points by 10 """
+    print("Pontuação antes: {}".format(score))
+    score += 10
+    print("Pontuação depois: {}".format(score))
+    return score
+
+
+font_name = pygame.font.match_font('arial')
+def draw_score(screen, score_points, size):
+    """ Draws score points on the screen """
+    _x = 360
+    _y = 50
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(score_points, True, white)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (_x, _y)
+    screen.blit(text_surface, text_rect)
 
 
 if __name__ == "__main__":
     white = (255, 255, 255)
 
+    SCORE = 0
+
     # Game Loop
     while not DONE:
         for event in pygame.event.get():
-            handle_event(event)
+
+            SCORE = handle_event(event, SCORE)
             if event.type == pygame.QUIT:
                 DONE = True
 
         screen.fill((0, 0, 0))
 
         draw.polygon(screen, line_color, polygon_points)  # Path for the notes
-
+        draw_score(screen, str(SCORE), 25)
         draw_note_target()
         # Outer (colored) Circle
         draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
