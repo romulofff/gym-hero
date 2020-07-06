@@ -15,6 +15,7 @@ x = [120, 160, 200, 240, 280]
 Y = 0
 radius = 10
 
+
 def move_notes(old_x, old_y):
     """Updates Y value"""
     new_x = []
@@ -44,48 +45,68 @@ def update_radius(old_radius):
         return 10
     return new_r
 
+
 def draw_note_target():
     """Draws the note target at the end of the track"""
     # Outer (colored) Circle
-    draw.circle(screen, (0, 255, 0), (64, 280), 30)
-    draw.circle(screen, (255, 0, 0), (132, 280), 30)
-    draw.circle(screen, (255, 255, 0), (200, 280), 30)
-    draw.circle(screen, (0, 0, 255), (268, 280), 30)
-    draw.circle(screen, (255, 128, 0), (336, 280), 30)
+    draw.circle(screen, (0, 255, 0), (64, 260), 30)
+    draw.circle(screen, (255, 0, 0), (132, 260), 30)
+    draw.circle(screen, (255, 255, 0), (200, 260), 30)
+    draw.circle(screen, (0, 0, 255), (268, 260), 30)
+    draw.circle(screen, (255, 128, 0), (336, 260), 30)
     # Inner Circle
-    draw.circle(screen, (55, 55, 55), (64, 280), 15)
-    draw.circle(screen, (55, 55, 55), (132, 280), 15)
-    draw.circle(screen, (55, 55, 55), (200, 280), 15)
-    draw.circle(screen, (55, 55, 55), (268, 280), 15)
-    draw.circle(screen, (55, 55, 55), (336, 280), 15)
+    draw.circle(screen, (55, 55, 55), (64, 260), 15)
+    draw.circle(screen, (55, 55, 55), (132, 260), 15)
+    draw.circle(screen, (55, 55, 55), (200, 260), 15)
+    draw.circle(screen, (55, 55, 55), (268, 260), 15)
+    draw.circle(screen, (55, 55, 55), (336, 260), 15)
 
 
-while not DONE:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            DONE = True
+def handle_event(event_obj):
+    """ Handles an event """
+    if event_obj.type == pygame.KEYDOWN:
+        # print(event_obj)
+        if event_obj.key == 27:
+            quit()
 
-    screen.fill((0, 0, 0))
+        if event_obj.unicode == 'a':
+            action = ''
+    return 'action'
 
-    draw.polygon(screen, line_color, polygon_points) # Path for the notes
 
-    draw_note_target()
-    # Outer (colored) Circle
-    draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
-    draw.circle(screen, (255, 0, 0), (x[1], Y), radius)
-    draw.circle(screen, (255, 255, 0), (x[2], Y), radius)
-    draw.circle(screen, (0, 0, 255), (x[3], Y), radius)
-    draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
-    # Inner Circle
-    draw.circle(screen, (255, 255, 255), (x[0], Y), int(radius/2))
-    draw.circle(screen, (255, 255, 255), (x[1], Y), int(radius/2))
-    draw.circle(screen, (255, 255, 255), (x[2], Y), int(radius/2))
-    draw.circle(screen, (255, 255, 255), (x[3], Y), int(radius/2))
-    draw.circle(screen, (255, 255, 255), (x[4], Y), int(radius/2))
-    x, Y = move_notes(x, Y)
-    if Y > 0:
-        radius = update_radius(radius)
-    else: radius = 10
+if __name__ == "__main__":
+    white = (255, 255, 255)
 
-    pygame.display.flip()
-    clock.tick(30)
+    # Game Loop
+    while not DONE:
+        for event in pygame.event.get():
+            handle_event(event)
+            if event.type == pygame.QUIT:
+                DONE = True
+
+        screen.fill((0, 0, 0))
+
+        draw.polygon(screen, line_color, polygon_points)  # Path for the notes
+
+        draw_note_target()
+        # Outer (colored) Circle
+        draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
+        draw.circle(screen, (255, 0, 0), (x[1], Y), radius)
+        draw.circle(screen, (255, 255, 0), (x[2], Y), radius)
+        draw.circle(screen, (0, 0, 255), (x[3], Y), radius)
+        draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
+        # Inner Circle
+        draw.circle(screen, white, (x[0], Y), int(radius/2))
+        draw.circle(screen, white, (x[1], Y), int(radius/2))
+        draw.circle(screen, white, (x[2], Y), int(radius/2))
+        draw.circle(screen, white, (x[3], Y), int(radius/2))
+        draw.circle(screen, white, (x[4], Y), int(radius/2))
+        x, Y = move_notes(x, Y)
+        if Y > 0:
+            radius = update_radius(radius)
+        else:
+            radius = 10
+
+        # get_key()
+        pygame.display.flip()
+        clock.tick(30)
