@@ -70,6 +70,29 @@ def draw_note_target():
     draw.circle(screen, gray, (268, target_y), target_inner_radius)
     draw.circle(screen, gray, (336, target_y), target_inner_radius)
 
+def draw_notes(should_draw):
+    """ Draw notes according to list """
+    if should_draw[0]:
+        draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
+        draw.circle(screen, white, (x[0], Y), int(radius/2))
+
+    if should_draw[1]:
+        draw.circle(screen, (255, 0, 0), (x[1], Y), radius)
+        draw.circle(screen, white, (x[1], Y), int(radius/2))
+
+    if should_draw[2]:
+        draw.circle(screen, (255, 255, 0), (x[2], Y), radius)
+        draw.circle(screen, white, (x[2], Y), int(radius/2))
+
+    if should_draw[3]:
+        draw.circle(screen, (0, 0, 255), (x[3], Y), radius)
+        draw.circle(screen, white, (x[3], Y), int(radius/2))
+
+    if should_draw[4]:
+        draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
+        draw.circle(screen, white, (x[4], Y), int(radius/2))
+
+
 
 def handle_event(event_obj, pressed, score):
     """ Handles an event """
@@ -118,9 +141,7 @@ if __name__ == "__main__":
     black = (0, 0, 0)
     SCORE = 0
 
-    shouldBePressed = [False, False, False, False, False]
-    for i in range(len(shouldBePressed)):
-        shouldBePressed[i] = bool(random.getrandbits(1))
+    shouldBeDrawn = shouldBePressed = [False, False, False, False, False]
 
     print(shouldBePressed)
 
@@ -128,6 +149,9 @@ if __name__ == "__main__":
     while not DONE:
 
         # Update Phase
+        for i in range(len(shouldBePressed)):
+            shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
+
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -149,19 +173,20 @@ if __name__ == "__main__":
         draw.polygon(screen, line_color, polygon_points)  # Path for the notes
         draw_score(screen, str(SCORE), 25)
         draw_note_target()
-        # Outer (colored) Circle
-        draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
-        draw.circle(screen, (255, 0, 0), (x[1], Y), radius)
-        draw.circle(screen, (255, 255, 0), (x[2], Y), radius)
-        draw.circle(screen, (0, 0, 255), (x[3], Y), radius)
-        draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
-        # Inner Circle
-        draw.circle(screen, white, (x[0], Y), int(radius/2))
-        draw.circle(screen, white, (x[1], Y), int(radius/2))
-        draw.circle(screen, white, (x[2], Y), int(radius/2))
-        draw.circle(screen, white, (x[3], Y), int(radius/2))
-        draw.circle(screen, white, (x[4], Y), int(radius/2))
+        draw_notes(shouldBeDrawn)
 
-        # get_key()
+        # # Outer (colored) Circle
+        # draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
+        # draw.circle(screen, (255, 0, 0), (x[1], Y), radius)
+        # draw.circle(screen, (255, 255, 0), (x[2], Y), radius)
+        # draw.circle(screen, (0, 0, 255), (x[3], Y), radius)
+        # draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
+        # # Inner Circle
+        # draw.circle(screen, white, (x[0], Y), int(radius/2))
+        # draw.circle(screen, white, (x[1], Y), int(radius/2))
+        # draw.circle(screen, white, (x[2], Y), int(radius/2))
+        # draw.circle(screen, white, (x[3], Y), int(radius/2))
+        # draw.circle(screen, white, (x[4], Y), int(radius/2))
+
         pygame.display.flip()
         clock.tick(30)
