@@ -19,7 +19,7 @@ Y = 0
 radius = 10
 
 
-def move_notes(old_x, old_y):
+def move_notes(old_x, old_y, new_notes):
     """Updates Y value"""
     new_x = []
     # Updating X coordinate
@@ -35,8 +35,9 @@ def move_notes(old_x, old_y):
     elif old_y >= 275:
         new_y = 0
         new_x = [120, 160, 200, 240, 280]
-    return new_x, new_y
-
+        new_notes = True
+        return new_x, new_y, new_notes
+    return new_x, new_y, False
 
 def update_radius(old_radius):
     """Updates the Circles radius"""
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     white = (255, 255, 255)
     black = (0, 0, 0)
     SCORE = 0
-
+    newNotes = False
     shouldBeDrawn = shouldBePressed = [False, False, False, False, False]
 
     print(shouldBePressed)
@@ -149,8 +150,10 @@ if __name__ == "__main__":
     while not DONE:
 
         # Update Phase
-        for i in range(len(shouldBePressed)):
-            shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
+        if newNotes:
+            for i in range(len(shouldBePressed)):
+                shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
+            print(shouldBePressed)
 
         for event in pygame.event.get():
 
@@ -161,7 +164,7 @@ if __name__ == "__main__":
 
 
         # Moving notes on screen
-        x, Y = move_notes(x, Y)
+        x, Y, newNotes = move_notes(x, Y, newNotes)
         if Y > 0:
             radius = update_radius(radius)
         else:
@@ -174,19 +177,6 @@ if __name__ == "__main__":
         draw_score(screen, str(SCORE), 25)
         draw_note_target()
         draw_notes(shouldBeDrawn)
-
-        # # Outer (colored) Circle
-        # draw.circle(screen, (0, 255, 0), (x[0], Y), radius)
-        # draw.circle(screen, (255, 0, 0), (x[1], Y), radius)
-        # draw.circle(screen, (255, 255, 0), (x[2], Y), radius)
-        # draw.circle(screen, (0, 0, 255), (x[3], Y), radius)
-        # draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
-        # # Inner Circle
-        # draw.circle(screen, white, (x[0], Y), int(radius/2))
-        # draw.circle(screen, white, (x[1], Y), int(radius/2))
-        # draw.circle(screen, white, (x[2], Y), int(radius/2))
-        # draw.circle(screen, white, (x[3], Y), int(radius/2))
-        # draw.circle(screen, white, (x[4], Y), int(radius/2))
 
         pygame.display.flip()
         clock.tick(30)
