@@ -1,8 +1,11 @@
 """
 Creating a Guitar Hero Clone Game
 """
-from pygame import draw
+
+import random
+
 import pygame
+from pygame import draw
 
 pygame.init()
 screen = pygame.display.set_mode((400, 310))
@@ -68,7 +71,7 @@ def draw_note_target():
     draw.circle(screen, gray, (336, target_y), target_inner_radius)
 
 
-def handle_event(event_obj, score):
+def handle_event(event_obj, pressed, score):
     """ Handles an event """
     if event_obj.type == pygame.KEYDOWN:
         # print(event_obj)
@@ -76,8 +79,17 @@ def handle_event(event_obj, score):
             print("Bye!")
             quit()
 
-        if event_obj.unicode == 'a':
+        if event_obj.unicode == 'a' and pressed[0]:
             return update_score(score)
+        if event_obj.unicode == 's' and pressed[1]:
+            return update_score(score)
+        if event_obj.unicode == 'd' and pressed[2]:
+            return update_score(score)
+        if event_obj.unicode == 'k' and pressed[3]:
+            return update_score(score)
+        if event_obj.unicode == 'l' and pressed[4]:
+            return update_score(score)
+
     return score
 
 
@@ -88,7 +100,6 @@ def update_score(score):
 
 
 font_name = pygame.font.match_font('arial')
-
 
 def draw_score(score_screen, score_points, size):
     """ Draws score points on the screen """
@@ -102,20 +113,39 @@ def draw_score(score_screen, score_points, size):
 
 
 if __name__ == "__main__":
-    white = (255, 255, 255)
 
+    white = (255, 255, 255)
+    black = (0, 0, 0)
     SCORE = 0
+
+    shouldBePressed = [False, False, False, False, False]
+    for i in range(len(shouldBePressed)):
+        shouldBePressed[i] = bool(random.getrandbits(1))
+
+    print(shouldBePressed)
 
     # Game Loop
     while not DONE:
+
+        # Update Phase
         for event in pygame.event.get():
 
-            SCORE = handle_event(event, SCORE)
             if event.type == pygame.QUIT:
                 DONE = True
+            else:
+                SCORE = handle_event(event, shouldBePressed, SCORE)
 
-        screen.fill((0, 0, 0))
 
+        # Moving notes on screen
+        x, Y = move_notes(x, Y)
+        if Y > 0:
+            radius = update_radius(radius)
+        else:
+            radius = 10
+
+
+        # Drawing Phase
+        screen.fill(black)
         draw.polygon(screen, line_color, polygon_points)  # Path for the notes
         draw_score(screen, str(SCORE), 25)
         draw_note_target()
@@ -131,11 +161,6 @@ if __name__ == "__main__":
         draw.circle(screen, white, (x[2], Y), int(radius/2))
         draw.circle(screen, white, (x[3], Y), int(radius/2))
         draw.circle(screen, white, (x[4], Y), int(radius/2))
-        x, Y = move_notes(x, Y)
-        if Y > 0:
-            radius = update_radius(radius)
-        else:
-            radius = 10
 
         # get_key()
         pygame.display.flip()
