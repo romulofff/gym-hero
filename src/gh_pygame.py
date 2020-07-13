@@ -141,7 +141,7 @@ if __name__ == "__main__":
     white = (255, 255, 255)
     black = (0, 0, 0)
     SCORE = 0
-    newNotes = False
+    NEW_NOTES = False
     shouldBeDrawn = shouldBePressed = [False, False, False, False, False]
 
     print(shouldBePressed)
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     while not DONE:
 
         # Update Phase
-        if newNotes:
+        if NEW_NOTES:
             for i in range(len(shouldBePressed)):
                 shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
             print(shouldBePressed)
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
 
         # Moving notes on screen
-        x, Y, newNotes = move_notes(x, Y, newNotes)
+        x, Y, NEW_NOTES = move_notes(x, Y, NEW_NOTES)
         if Y > 0:
             radius = update_radius(radius)
         else:

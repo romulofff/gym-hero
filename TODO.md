@@ -22,3 +22,9 @@ Preciso detectar quando a nota colidir com o fret. Isso deve acontecer, caso o j
 ### SCORE POINTS:
 - Melhorias gerais
 - Atualizar valor quando houver colisão
+
+### JANELA DESLIZANTE:
+- Criar imagem de track
+- Criar janela delizante
+- Transformar perspectiva
+    - Retânagulo --> Trapézio
