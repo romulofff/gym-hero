@@ -20,11 +20,11 @@ def choose_color():
 
 def draw_line(screen):
     """ Draw the lines where the notes will roll """
-    draw.line(screen, (100, 100, 100), (120, 0), (120, 2160), 3)
-    draw.line(screen, (100, 100, 100), (160, 0), (160, 2160), 3)
+    draw.line(screen, (100, 100, 100), (100, 0), (100, 2160), 3)
+    draw.line(screen, (100, 100, 100), (150, 0), (150, 2160), 3)
     draw.line(screen, (100, 100, 100), (200, 0), (200, 2160), 3)
-    draw.line(screen, (100, 100, 100), (240, 0), (240, 2160), 3)
-    draw.line(screen, (100, 100, 100), (280, 0), (280, 2160), 3)
+    draw.line(screen, (100, 100, 100), (250, 0), (250, 2160), 3)
+    draw.line(screen, (100, 100, 100), (300, 0), (300, 2160), 3)
 
 
 pygame.init()
@@ -32,7 +32,7 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((400, int(1080*1.5)))
 line_color = (128, 128, 128)
 polygon_points = [(50, 0), (350, 0), (350, 3000), (50, 3000)]
-x = [120, 160, 200, 240, 280]
+x = [100, 150, 200, 250, 300]
 
 
 draw.polygon(screen, line_color, polygon_points)  # Path for the notes
@@ -45,4 +45,4 @@ for y in range(20, int(1080*1.5), 20):
     draw.circle(screen, choose_color(), (choice(x), y), 10)
 
 pygame.display.flip()
-pygame.image.save(screen, 'chart.png')
+pygame.image.save(screen, '../chart.png')
