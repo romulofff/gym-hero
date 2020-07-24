@@ -3,9 +3,9 @@ import pygame
 black = (0, 0, 0)
 
 pygame.init()
-screen = pygame.display.set_mode((440, 400))
+screen = pygame.display.set_mode((400, 400))
 
-img = pygame.image.load('chart.png')
+img = pygame.image.load('../chart.png')
 img_rect = img.get_rect().size
 # img.convert()
 
