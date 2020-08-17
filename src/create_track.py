@@ -8,15 +8,24 @@ from random import choice
 import pygame
 from pygame import draw
 
-def choose_color():
+def choose_color(x):
     """ Chooses a random color from the ones defined """
-    green = (0, 255, 0)
-    red = (255, 0, 0)
-    yellow = (255, 255, 0)
-    blue = (0, 0, 255)
-    orange = (255, 128, 0)
-
-    return choice([green, red, yellow, blue, orange])
+    if x == 100:
+        green = (0, 255, 0)
+        return green
+    elif x == 150:
+        red = (255, 0, 0)
+        return red
+    elif x == 200:
+        yellow = (255, 255, 0)
+        return yellow
+    elif x == 250:
+        blue = (0, 0, 255)
+        return blue
+    else:
+        orange = (255, 128, 0)
+        return orange
+    # return choice([green, red, yellow, blue, orange])
 
 
 def draw_line(screen):
@@ -43,9 +52,18 @@ draw_line(screen)
 for y in range(20, height+250, 60):
     draw.line(screen, (200, 200, 200), (50, y), (350, y), 3)
 
-for y in range(250, height, 20):
-    draw.circle(screen, choose_color(), (choice(x), y), 10)
+notes = list()
+for y in range(250, height, 30):
+    _x = choice(x)
+    draw.circle(screen, choose_color(_x), (_x, y), 10)
+    notes.append([_x, y])
+
 
 pygame.display.flip()
-pygame.image.save(screen, '../chart4.png')
+pygame.image.save(screen, '../chart6.png')
+with open("notes_chart6.txt", "w") as f:
+    for note in notes:
+        f.write(str(note))
+        # f.write('\n')
+    f.close()
 # sleep(60)

@@ -8,7 +8,7 @@ import pygame
 from pygame import draw
 
 pygame.init()
-screen = pygame.display.set_mode((400, 310))
+screen = pygame.display.set_mode((400, 400))
 DONE = False
 
 line_color = (128, 128, 128)
@@ -52,24 +52,24 @@ def update_radius(old_radius):
 
 def draw_note_target():
     """Draws the note target at the end of the track"""
-    target_y = 260
-    target_outer_radius = 30
-    target_inner_radius = 15
+    target_y = 360
+    target_outer_radius = 20
+    target_inner_radius = 10
 
     gray = (55, 55, 55)
 
     # Outer (colored) Circle
-    draw.circle(screen, (0, 255, 0), (64, target_y), target_outer_radius)
-    draw.circle(screen, (255, 0, 0), (132, target_y), target_outer_radius)
+    draw.circle(screen, (0, 255, 0), (100, target_y), target_outer_radius)
+    draw.circle(screen, (255, 0, 0), (150, target_y), target_outer_radius)
     draw.circle(screen, (255, 255, 0), (200, target_y), target_outer_radius)
-    draw.circle(screen, (0, 0, 255), (268, target_y), target_outer_radius)
-    draw.circle(screen, (255, 128, 0), (336, target_y), target_outer_radius)
+    draw.circle(screen, (0, 0, 255), (250, target_y), target_outer_radius)
+    draw.circle(screen, (255, 128, 0), (300, target_y), target_outer_radius)
     # Inner Circle
-    draw.circle(screen, gray, (64, target_y), target_inner_radius)
-    draw.circle(screen, gray, (132, target_y), target_inner_radius)
+    draw.circle(screen, gray, (100, target_y), target_inner_radius)
+    draw.circle(screen, gray, (150, target_y), target_inner_radius)
     draw.circle(screen, gray, (200, target_y), target_inner_radius)
-    draw.circle(screen, gray, (268, target_y), target_inner_radius)
-    draw.circle(screen, gray, (336, target_y), target_inner_radius)
+    draw.circle(screen, gray, (250, target_y), target_inner_radius)
+    draw.circle(screen, gray, (300, target_y), target_inner_radius)
 
 def draw_notes(should_draw):
     """ Draw notes according to list """
@@ -146,14 +146,26 @@ if __name__ == "__main__":
 
     print(shouldBePressed)
 
+    # mylist = []
+    # with open('notes_chart6.txt', 'r') as f:
+    #     for line in f.readlines():
+    #         if len(line) > 1:
+    #             mylist.append(line)
+    # print(mylist)
+
+
+    img = pygame.image.load('../chart5.png')
+    img_rect = img.get_rect().size
+    y = -img_rect[1] +380
+
     # Game Loop
     while not DONE:
 
         # Update Phase
-        if NEW_NOTES:
-            for i in range(len(shouldBePressed)):
-                shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
-            print(shouldBePressed)
+        # if NEW_NOTES:
+        #     for i in range(len(shouldBePressed)):
+        #         shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
+        #     print(shouldBePressed)
 
         for event in pygame.event.get():
 
@@ -173,10 +185,12 @@ if __name__ == "__main__":
 
         # Drawing Phase
         screen.fill(black)
-        draw.polygon(screen, line_color, polygon_points)  # Path for the notes
+        # draw.polygon(screen, line_color, polygon_points)  # Path for the notes
+        screen.blit(img, (0, y))
         draw_score(screen, str(SCORE), 25)
         draw_note_target()
-        draw_notes(shouldBeDrawn)
-
+        # draw_notes(shouldBeDrawn)
+        # print(x, y)
+        y += 1
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(60)

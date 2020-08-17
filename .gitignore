@@ -3,10 +3,12 @@ venv/
 pygame_tutorial.py
 ideias.md.backup
 Metallica - One/
-Guitar Hero III - Legends Of Rock.rar
 12 Clusterfucks of Christmas by Schmutz06/
-12 Clusterfucks of Christmas by Schmutz06.zip
+*.rar
+*.zip
 Metallica - Sad But True/
 RATM - Bulls On Parade/
 gnr/
 song_list.jpg
+__pycache__/
+warped*
