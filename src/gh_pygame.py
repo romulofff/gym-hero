@@ -93,6 +93,14 @@ def draw_notes(should_draw):
         draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
         draw.circle(screen, white, (x[4], Y), int(radius/2))
 
+def draw_line(screen):
+    """ Draw the lines where the notes will roll """
+    height = 400
+    draw.line(screen, (100, 100, 100), (120, 0), (40, height), 3)
+    draw.line(screen, (100, 100, 100), (160, 0), (120, height), 3)
+    draw.line(screen, (100, 100, 100), (200, 0), (200, height), 3)
+    draw.line(screen, (100, 100, 100), (240, 0), (280, height), 3)
+    draw.line(screen, (100, 100, 100), (280, 0), (360, height), 3)
 
 
 def handle_event(event_obj, pressed, score):
@@ -175,6 +183,7 @@ if __name__ == "__main__":
         screen.fill(black)
         draw.polygon(screen, line_color, polygon_points)  # Path for the notes
         draw_score(screen, str(SCORE), 25)
+        draw_line(screen)
         draw_note_target()
         draw_notes(shouldBeDrawn)
 
