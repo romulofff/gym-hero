@@ -3,6 +3,7 @@ Creating a Guitar Hero Clone Game
 """
 
 import random
+from ast import literal_eval
 
 import pygame
 from pygame import draw
@@ -50,11 +51,16 @@ def update_radius(old_radius):
     return new_r
 
 
-def draw_note_target():
+def draw_note_target(is_pressed=False):
     """Draws the note target at the end of the track"""
     target_y = 360
-    target_outer_radius = 20
-    target_inner_radius = 10
+    if is_pressed:
+        target_outer_radius = 10
+        target_inner_radius = 5
+
+    else:
+        target_outer_radius = 20
+        target_inner_radius = 10
 
     gray = (55, 55, 55)
 
@@ -146,14 +152,17 @@ if __name__ == "__main__":
 
     print(shouldBePressed)
 
-    # mylist = []
-    # with open('notes_chart6.txt', 'r') as f:
-    #     for line in f.readlines():
-    #         if len(line) > 1:
-    #             mylist.append(line)
-    # print(mylist)
-
-
+    with open('notes_chart6.txt', 'r') as f:
+        line = f.read()
+        print("Enter")
+        if len(line) > 0:
+            print('SPACE')
+            line = line.split('\n')
+    line.pop(-1)
+    mylist = []
+    for l in line:
+        mylist.append(literal_eval(l))
+    
     img = pygame.image.load('../chart5.png')
     img_rect = img.get_rect().size
     y = -img_rect[1] +380
@@ -185,12 +194,10 @@ if __name__ == "__main__":
 
         # Drawing Phase
         screen.fill(black)
-        # draw.polygon(screen, line_color, polygon_points)  # Path for the notes
         screen.blit(img, (0, y))
         draw_score(screen, str(SCORE), 25)
         draw_note_target()
-        # draw_notes(shouldBeDrawn)
-        # print(x, y)
+
         y += 1
         pygame.display.flip()
         clock.tick(60)

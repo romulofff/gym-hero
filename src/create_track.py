@@ -61,9 +61,10 @@ for y in range(250, height, 30):
 
 pygame.display.flip()
 pygame.image.save(screen, '../chart6.png')
+
 with open("notes_chart6.txt", "w") as f:
     for note in notes:
         f.write(str(note))
-        # f.write('\n')
+        f.write('\n')
     f.close()
 # sleep(60)
