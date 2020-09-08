@@ -28,3 +28,18 @@ Preciso detectar quando a nota colidir com o fret. Isso deve acontecer, caso o j
 - Criar janela delizante
 - Transformar perspectiva
     - Retânagulo --> Trapézio
+
+### TESTE DE FEATURES
+- Poder retornar o array de screen buffer, label buffer e depth buffer (se tiver)
+    - Screen buffer --> **OK**
+    - Label buffer --> ?
+- Vários tipos de label buffer (só foreground/background, 1 valor pra cada traste, 1 valor pra cada elemento na tela, ...)
+- Desligar a renderização (com duas oopções: 1. mantém o buffer mas não mostra na tela e 2. sequer cria o buffer)
+    - Mantendo buffer --> **OK**
+- Modo jogador (usando input do teclado/controle) e modo COM --> **OK**
+- Modificar o visual do jogo facilmente
+- Mudar os valores de recompensa, score multiplicador, ..., facilmente (arquivo de configs, por ex)
+- Resolução custom --> **OK**
+- Renderização em vários modos de imagem (rgb, bgr, grayscale, ...)
+- Instalação via pip
+- Modo multiplayer
