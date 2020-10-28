@@ -43,3 +43,11 @@ Preciso detectar quando a nota colidir com o fret. Isso deve acontecer, caso o j
 - Renderização em vários modos de imagem (rgb, bgr, grayscale, ...)
 - Instalação via pip
 - Modo multiplayer
+
+
+### Lógica de Colisão (Sugestão Hyuan)
+No intervalo de tempo em que a nota e o traste estão colidindo (bouding boxes cruzando) ativar varíavel de estado booleana. 
+- Se a variável de estado E a tecla pressionada: HIT OK
+- Se a variável de estado E não a tecla pressionada: HIT MISS
+- Se não a variável de estado E a tecla pressionada: HIT MISS
+- Se não a variável de estado E não a tecla pressionada: PASS
