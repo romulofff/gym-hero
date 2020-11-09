@@ -52,7 +52,8 @@ def update_radius(old_radius):
 
 def draw_note_target():
     """Draws the note target at the end of the track"""
-    target_y = 260
+    height = screen.get_height()
+    target_y = int(height - 10/100*height)
     target_outer_radius = 30
     target_inner_radius = 15
 
@@ -95,7 +96,7 @@ def draw_notes(should_draw):
 
 def draw_line(screen):
     """ Draw the lines where the notes will roll """
-    height = 400
+    height = screen.get_height()
     draw.line(screen, (100, 100, 100), (120, 0), (40, height), 3)
     draw.line(screen, (100, 100, 100), (160, 0), (120, height), 3)
     draw.line(screen, (100, 100, 100), (200, 0), (200, height), 3)
