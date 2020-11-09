@@ -14,7 +14,7 @@ from utils import draw_line, draw_note_target
 pygame.init()
 clock = pygame.time.Clock()
 
-screen = pygame.display.set_mode((400, 720))
+screen = pygame.display.set_mode((450, 720))
 
 when_things_happen = [x for x in arange(0, 10, 0.5)]
 # print(when_things_happen, len(when_things_happen))
@@ -26,7 +26,7 @@ def check_if_close(elapsed_time, times):
         if elapsed_time - interval <= time <= elapsed_time + interval:
         # if time - interval <= elapsed_time <= time + interval:
         
-           print(elapsed_time, time+interval, time-interval, time)
+           print(elapsed_time, time+interval, time-interval, time, True)
            return True
         print(elapsed_time, time+interval, time-interval, time)
 
@@ -50,6 +50,7 @@ if __name__ == "__main__":
         # print(happening)
 
         for e in pygame.event.get():
+            print("Got event!", e)
             if e.type==pygame.KEYDOWN and e.key == 27:
                 print("Bye!")
                 quit()
@@ -63,7 +64,7 @@ if __name__ == "__main__":
         for x in happening:
             screen.fill(0)
             text_surface = font.render(str(x), True, color)
-            screen.blit(text_surface, (180,140))
+            screen.blit(text_surface, (380,140))
             when_things_happen.remove(x)
         draw_line(screen)
         draw_note_target(screen)
