@@ -54,7 +54,7 @@ if __name__ == "__main__":
             if e.type==pygame.KEYDOWN and e.key == 27:
                 print("Bye!")
                 quit()
-            if e.type==pygame.KEYDOWN and e.key == pygame.K_SPACE:
+            if e.type==pygame.KEYDOWN and e.key == 32:
             # if e.type==pygame.KEYDOWN:
                 if check_if_close(elapsed_time, happening):
                     print("SPACE BAR PRESSED RIGHT")

@@ -20,14 +20,14 @@ def draw_note_target(screen):
     gray = (55, 55, 55)
 
     # Outer (colored) Circle
-    draw.circle(screen, (0, 255, 0), (64, target_y), target_outer_radius)
-    draw.circle(screen, (255, 0, 0), (132, target_y), target_outer_radius)
+    draw.circle(screen, (0, 255, 0), (50, target_y), target_outer_radius)
+    draw.circle(screen, (255, 0, 0), (125, target_y), target_outer_radius)
     draw.circle(screen, (255, 255, 0), (200, target_y), target_outer_radius)
-    draw.circle(screen, (0, 0, 255), (268, target_y), target_outer_radius)
-    draw.circle(screen, (255, 128, 0), (336, target_y), target_outer_radius)
+    draw.circle(screen, (0, 0, 255), (275, target_y), target_outer_radius)
+    draw.circle(screen, (255, 128, 0), (350, target_y), target_outer_radius)
     # Inner Circle
-    draw.circle(screen, gray, (64, target_y), target_inner_radius)
-    draw.circle(screen, gray, (132, target_y), target_inner_radius)
+    draw.circle(screen, gray, (50, target_y), target_inner_radius)
+    draw.circle(screen, gray, (125, target_y), target_inner_radius)
     draw.circle(screen, gray, (200, target_y), target_inner_radius)
-    draw.circle(screen, gray, (268, target_y), target_inner_radius)
-    draw.circle(screen, gray, (336, target_y), target_inner_radius)
+    draw.circle(screen, gray, (275, target_y), target_inner_radius)
+    draw.circle(screen, gray, (350, target_y), target_inner_radius)
