@@ -70,3 +70,7 @@ def Game():
         draw_note_target(screen)
         pygame.display.update()
         clock.tick(30)
+
+
+if __name__ == "__main__":
+    Game()
