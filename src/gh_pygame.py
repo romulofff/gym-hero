@@ -39,6 +39,7 @@ def move_notes(old_x, old_y, new_notes):
         return new_x, new_y, new_notes
     return new_x, new_y, False
 
+
 def update_radius(old_radius):
     """Updates the Circles radius"""
     if old_radius >= 5 and old_radius < 30:
@@ -72,6 +73,7 @@ def draw_note_target():
     draw.circle(screen, gray, (268, target_y), target_inner_radius)
     draw.circle(screen, gray, (336, target_y), target_inner_radius)
 
+
 def draw_notes(should_draw):
     """ Draw notes according to list """
     if should_draw[0]:
@@ -94,6 +96,7 @@ def draw_notes(should_draw):
         draw.circle(screen, (255, 128, 0), (x[4], Y), radius)
         draw.circle(screen, white, (x[4], Y), int(radius/2))
 
+
 def draw_line(screen):
     """ Draw the lines where the notes will roll """
     height = screen.get_height()
@@ -102,6 +105,21 @@ def draw_line(screen):
     draw.line(screen, (100, 100, 100), (200, 0), (200, height), 3)
     draw.line(screen, (100, 100, 100), (240, 0), (280, height), 3)
     draw.line(screen, (100, 100, 100), (280, 0), (360, height), 3)
+
+
+interval = 1.0
+def check_if_close(elapsed_time, times):
+    print("TIMES:", times)
+    for time in times:
+        print("TIME:", time)
+        if elapsed_time - interval <= time <= elapsed_time + interval:
+            # if time - interval <= elapsed_time <= time + interval:
+
+            print(elapsed_time, time+interval, time-interval, time, True)
+            return True
+        print(elapsed_time, time+interval, time-interval, time, False)
+
+    return False
 
 
 def handle_event(event_obj, pressed, score):
@@ -134,6 +152,7 @@ def update_score(score):
 
 font_name = pygame.font.match_font('arial')
 
+
 def draw_score(score_screen, score_points, size):
     """ Draws score points on the screen """
     _x = 360
@@ -161,7 +180,8 @@ if __name__ == "__main__":
         # Update Phase
         if NEW_NOTES:
             for i in range(len(shouldBePressed)):
-                shouldBePressed[i] = shouldBeDrawn[i] = bool(random.getrandbits(1))
+                shouldBePressed[i] = shouldBeDrawn[i] = bool(
+                    random.getrandbits(1))
             print(shouldBePressed)
 
         for event in pygame.event.get():
@@ -171,14 +191,12 @@ if __name__ == "__main__":
             else:
                 SCORE = handle_event(event, shouldBePressed, SCORE)
 
-
         # Moving notes on screen
         x, Y, NEW_NOTES = move_notes(x, Y, NEW_NOTES)
         if Y > 0:
             radius = update_radius(radius)
         else:
             radius = 10
-
 
         # Drawing Phase
         screen.fill(black)
