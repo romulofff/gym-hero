@@ -22,9 +22,10 @@ class Note(pygame.sprite.Sprite):
     def __init__(self, img, imgX, imgY):
         super().__init__()
 
-        self.img = img
-        pygame.transform.scale(self.img, (60, 60))
-        self.rect = self.img.get_rect()
+        self.image = img
+        self.image.set_colorkey((255,255,255))
+        pygame.transform.scale(self.image, (5, 5))
+        self.rect = self.image.get_rect()
         # print(self.rect)
 
 
@@ -33,7 +34,7 @@ screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 
-# RED bites
+# RED notes
 redImg = pygame.image.load(
     path.join('..', 'assets', 'redbutton.png')).convert()
 redX = 274
@@ -53,8 +54,10 @@ for i in range(10):
     note_list.add(note)
     all_sprites_list.add(note)
 
-# Fret
-redFret = Note(redImg, 670, 400)
+# GreenFret
+greenImg = pygame.image.load(
+    path.join('..', 'assets', 'greenbutton.png')).convert()
+redFret = Note(greenImg, 100, 400)
 all_sprites_list.add(redFret)
 
 # Game Loop
@@ -66,6 +69,12 @@ while not done:
         if event.type == pygame.QUIT:
             done = True
 
-    screen.fill((0, 0, 0))
+    screen.fill((255, 255, 255))
 
     notes_hit_list = pygame.sprite.spritecollide(redFret, note_list, True)
+
+    all_sprites_list.draw(screen)
+    clock.tick(60)
+    pygame.display.flip()
+
+pygame.quit()
