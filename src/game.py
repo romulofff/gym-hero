@@ -1,8 +1,9 @@
-import pygame
-from pygame import mixer
 import math
 import random
 from os import path
+
+import pygame
+from pygame import mixer
 
 
 def EuclidianDistance(x1, y1, x2, y2):
@@ -44,7 +45,7 @@ red_note = Note(redImg, redX, redY)
 note_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
-for i in range (10):
+for i in range(10):
     note = Note(redImg, redX, redY)
     note.rect.x = random.randrange(screen_width)
     note.rect.y = random.randrange(screen_height)
@@ -52,7 +53,7 @@ for i in range (10):
     note_list.add(note)
     all_sprites_list.add(note)
 
-# Fret 
+# Fret
 redFret = Note(redImg, 670, 400)
 all_sprites_list.add(redFret)
 
@@ -64,7 +65,7 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-    
+
     screen.fill((0, 0, 0))
 
     notes_hit_list = pygame.sprite.spritecollide(redFret, note_list, True)
