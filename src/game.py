@@ -23,11 +23,16 @@ class Note(pygame.sprite.Sprite):
         super().__init__()
 
         self.image = img
-        self.image.set_colorkey((255,255,255))
-        pygame.transform.scale(self.image, (5, 5))
+        self.image.set_colorkey((0,0,0))
+        self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
         # print(self.rect)
 
+    def update(self):
+        self.rect.y += 1 
+        if self.rect.y > screen_height:
+            print("KILLING")
+            self.kill()
 
 pygame.init()
 screen_width = 800
@@ -46,10 +51,10 @@ red_note = Note(redImg, redX, redY)
 note_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
-for i in range(10):
+for i in range(50):
     note = Note(redImg, redX, redY)
-    note.rect.x = random.randrange(screen_width)
-    note.rect.y = random.randrange(screen_height)
+    note.rect.x = random.choice([200, 300, 400, 500])
+    note.rect.y = random.uniform(-600*3, -60)
 
     note_list.add(note)
     all_sprites_list.add(note)
@@ -68,11 +73,18 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                redFret.rect.x += 10
+            if event.key == pygame.K_UP:
+                redFret.rect.y += 10
+            
+    screen.fill((0, 0, 0))
 
-    screen.fill((255, 255, 255))
-
-    notes_hit_list = pygame.sprite.spritecollide(redFret, note_list, True)
-
+    notes_hit_list = pygame.sprite.spritecollide(redFret, note_list, False)
+    if len(notes_hit_list) > 0:
+        print(notes_hit_list)
+    note_list.update()
     all_sprites_list.draw(screen)
     clock.tick(60)
     pygame.display.flip()
