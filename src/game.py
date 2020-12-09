@@ -133,8 +133,26 @@ while not done:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
                 green_notes_hit_list[0].update(True)
+                # print('Pressed Green')
                 score += 10
        
+            if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
+                red_notes_hit_list[0].update(True)
+                # print('Pressed Red')
+                score += 10
+       
+            if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
+                yellow_notes_hit_list[0].update(True)
+                # print('Pressed Yellow')
+                score += 10
+       
+            if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
+                blue_notes_hit_list[0].update(True)
+                # print('Pressed Blue')
+                score += 10
+       
+    if len(all_notes_list) == 0:
+        done = True
 
     screen.fill((0, 0, 0))
 
