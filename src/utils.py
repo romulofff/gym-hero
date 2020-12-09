@@ -1,3 +1,4 @@
+import pygame
 from pygame import draw
 
 
@@ -31,3 +32,15 @@ def draw_note_target(screen):
     draw.circle(screen, gray, (200, target_y), target_inner_radius)
     draw.circle(screen, gray, (275, target_y), target_inner_radius)
     draw.circle(screen, gray, (350, target_y), target_inner_radius)
+
+font_name = pygame.font.match_font('arial')
+white = (255, 255, 255)
+def draw_score(score_screen, score_points, size):
+    """ Draws score points on the screen """
+    _x = 760
+    _y = 50
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(score_points, True, white)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (_x, _y)
+    score_screen.blit(text_surface, text_rect)

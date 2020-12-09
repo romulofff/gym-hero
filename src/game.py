@@ -5,6 +5,8 @@ from os import path
 import pygame
 from pygame import mixer
 
+from utils import draw_score
+
 
 def EuclidianDistance(x1, y1, x2, y2):
     return math.sqrt((math.pow(x1-x2, 2)) + (math.pow(y1 - y2, 2)))
@@ -19,7 +21,7 @@ def Collision(noteX, noteY, ButtonX, ButtonY):
 
 
 class Note(pygame.sprite.Sprite):
-    def __init__(self, img, imgX, imgY):
+    def __init__(self, img):
         super().__init__()
 
         self.image = img
@@ -28,14 +30,15 @@ class Note(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         # print(self.rect)
 
-    def update(self):
-        self.rect.y += 1
-        if self.rect.y > screen_height + 60:
+    def update(self, to_kill=None):
+        if self.rect.y > screen_height + 60 or to_kill == True:
             self.kill()
+
+        self.rect.y += 1
 
 
 class Fret(pygame.sprite.Sprite):
-    def __init__(self, img, imgX, imgY, color):
+    def __init__(self, img,color):
         super().__init__()
 
         self.image = img
@@ -58,14 +61,8 @@ screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 
-# RED notes
 redImg = pygame.image.load(
     path.join('..', 'assets', 'redbutton.png')).convert()
-redX = 274
-# redY = random.randint(-1472, -128)  # randomizes intial y-position
-redY = 100  # randomizes intial y-position
-redChange = random.uniform(2, 3)  # randomizes intial speed
-red_note = Note(redImg, redX, redY)
 
 green_notes_list = pygame.sprite.Group()
 red_notes_list = pygame.sprite.Group()
@@ -75,7 +72,7 @@ all_notes_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
 for i in range(50):
-    note = Note(redImg, redX, redY)
+    note = Note(redImg)
     rect_x = random.choice([200, 300, 400, 500])  # choose note color
     note.rect.x = rect_x
     note.rect.y = random.uniform(-600*3, -60)
@@ -95,25 +92,25 @@ for i in range(50):
 # GreenFret
 greenImg = pygame.image.load(
     path.join('..', 'assets', 'greenbutton.png')).convert()
-greenFret = Fret(greenImg, 100, 400, 'green')
+greenFret = Fret(greenImg, 'green')
 all_sprites_list.add(greenFret)
 
 # RedFret
 redImg = pygame.image.load(
     path.join('..', 'assets', 'redbutton.png')).convert()
-redFret = Fret(redImg, 100, 400, 'red')
+redFret = Fret(redImg, 'red')
 all_sprites_list.add(redFret)
 
 # YellowFret
 yellowImg = pygame.image.load(
     path.join('..', 'assets', 'yellowbutton.png')).convert()
-yellowFret = Fret(yellowImg, 100, 400, 'yellow')
+yellowFret = Fret(yellowImg, 'yellow')
 all_sprites_list.add(yellowFret)
 
 # BlueFret
 blueImg = pygame.image.load(
     path.join('..', 'assets', 'bluebutton.png')).convert()
-blueFret = Fret(blueImg, 100, 400, 'blue')
+blueFret = Fret(blueImg, 'blue')
 all_sprites_list.add(blueFret)
 
 # Game Loop
@@ -133,11 +130,11 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-        # if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
-                redFret.rect.x += 10
-        #     if event.key == pygame.K_UP:
-        #         redFret.rect.y += 10
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
+                green_notes_hit_list[0].update(True)
+                score += 10
+       
 
     screen.fill((0, 0, 0))
 
@@ -145,7 +142,7 @@ while not done:
     all_notes_list.update()
 
     all_sprites_list.draw(screen)
-
+    draw_score(screen, str(score), 25)
     clock.tick(60)
     pygame.display.flip()
 
