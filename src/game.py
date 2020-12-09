@@ -23,16 +23,35 @@ class Note(pygame.sprite.Sprite):
         super().__init__()
 
         self.image = img
-        self.image.set_colorkey((0,0,0))
+        self.image.set_colorkey((0, 0, 0))
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
         # print(self.rect)
 
     def update(self):
-        self.rect.y += 1 
-        if self.rect.y > screen_height:
-            print("KILLING")
+        self.rect.y += 1
+        if self.rect.y > screen_height + 60:
             self.kill()
+
+
+class Fret(pygame.sprite.Sprite):
+    def __init__(self, img, imgX, imgY, color):
+        super().__init__()
+
+        self.image = img
+        self.image.set_colorkey((0, 0, 0))
+        self.image = pygame.transform.scale(self.image, (60, 60))
+        self.rect = self.image.get_rect()
+        self.rect.y = 540
+        if color.lower() == 'green':
+            self.rect.x = 200
+        if color.lower() == 'red':
+            self.rect.x = 300
+        if color.lower() == 'yellow':
+            self.rect.x = 400
+        if color.lower() == 'blue':
+            self.rect.x = 500
+        
 
 pygame.init()
 screen_width = 800
@@ -62,8 +81,26 @@ for i in range(50):
 # GreenFret
 greenImg = pygame.image.load(
     path.join('..', 'assets', 'greenbutton.png')).convert()
-redFret = Note(greenImg, 100, 400)
+greenFret = Fret(greenImg, 100, 400, 'green')
+all_sprites_list.add(greenFret)
+
+# RedFret
+redImg = pygame.image.load(
+    path.join('..', 'assets', 'redbutton.png')).convert()
+redFret = Fret(redImg, 100, 400, 'red')
 all_sprites_list.add(redFret)
+
+# YellowFret
+yellowImg = pygame.image.load(
+    path.join('..', 'assets', 'yellowbutton.png')).convert()
+yellowFret = Fret(yellowImg, 100, 400, 'yellow')
+all_sprites_list.add(yellowFret)
+
+# BlueFret
+blueImg = pygame.image.load(
+    path.join('..', 'assets', 'bluebutton.png')).convert()
+blueFret = Fret(blueImg, 100, 400, 'blue')
+all_sprites_list.add(blueFret)
 
 # Game Loop
 clock = pygame.time.Clock()
@@ -73,15 +110,15 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_DOWN:
-                redFret.rect.x += 10
-            if event.key == pygame.K_UP:
-                redFret.rect.y += 10
-            
+        # if event.type == pygame.KEYDOWN:
+        #     if event.key == pygame.K_DOWN:
+        #         redFret.rect.x += 10
+        #     if event.key == pygame.K_UP:
+        #         redFret.rect.y += 10
+
     screen.fill((0, 0, 0))
 
-    notes_hit_list = pygame.sprite.spritecollide(redFret, note_list, False)
+    notes_hit_list = pygame.sprite.spritecollide(redFret, note_list, True)
     if len(notes_hit_list) > 0:
         print(notes_hit_list)
     note_list.update()
