@@ -71,23 +71,6 @@ blue_notes_list = pygame.sprite.Group()
 all_notes_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
-for i in range(50):
-    note = Note(redImg)
-    rect_x = random.choice([200, 300, 400, 500])  # choose note color
-    note.rect.x = rect_x
-    note.rect.y = random.uniform(-600*3, -60)
-
-    if rect_x == 200:
-        green_notes_list.add(note)
-    if rect_x == 300:
-        red_notes_list.add(note)
-    if rect_x == 400:
-        yellow_notes_list.add(note)
-    if rect_x == 500:
-        blue_notes_list.add(note)
-
-    all_notes_list.add(note)
-    all_sprites_list.add(note)
 
 # GreenFret
 greenImg = pygame.image.load(
@@ -112,6 +95,32 @@ blueImg = pygame.image.load(
     path.join('..', 'assets', 'bluebutton.png')).convert()
 blueFret = Fret(blueImg, 'blue')
 all_sprites_list.add(blueFret)
+
+for i in range(50):
+    rect_x = random.choice([200, 300, 400, 500])  # choose note color
+    if rect_x == 200:
+        note = Note(greenImg)
+        note.rect.x = rect_x
+        note.rect.y = random.uniform(-600*3, -60)
+        green_notes_list.add(note)
+    if rect_x == 300:
+        note = Note(redImg)
+        note.rect.x = rect_x
+        note.rect.y = random.uniform(-600*3, -60)
+        red_notes_list.add(note)
+    if rect_x == 400:
+        note = Note(yellowImg)
+        note.rect.x = rect_x
+        note.rect.y = random.uniform(-600*3, -60)
+        yellow_notes_list.add(note)
+    if rect_x == 500:
+        note = Note(blueImg)
+        note.rect.x = rect_x
+        note.rect.y = random.uniform(-600*3, -60)
+        blue_notes_list.add(note)
+
+    all_notes_list.add(note)
+    all_sprites_list.add(note)
 
 # Game Loop
 clock = pygame.time.Clock()
