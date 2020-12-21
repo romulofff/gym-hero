@@ -5,7 +5,7 @@ from os import path
 import pygame
 from pygame import mixer
 
-from utils import draw_score, draw_line
+from utils import draw_line, draw_score
 
 
 def EuclidianDistance(x1, y1, x2, y2):
@@ -38,7 +38,7 @@ class Note(pygame.sprite.Sprite):
 
 
 class Fret(pygame.sprite.Sprite):
-    def __init__(self, img,color):
+    def __init__(self, img, color):
         super().__init__()
 
         self.image = img
@@ -126,6 +126,8 @@ for i in range(50):
 clock = pygame.time.Clock()
 score = 0
 done = False
+# line_color = (128, 128, 128)
+# polygon_points = [(150, 0), (600, 0), (600, screen_height), (150, screen_height)]
 while not done:
     green_notes_hit_list = pygame.sprite.spritecollide(
         greenFret, green_notes_list, False)
@@ -144,22 +146,22 @@ while not done:
                 green_notes_hit_list[0].update(True)
                 # print('Pressed Green')
                 score += 10
-       
+
             if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
                 red_notes_hit_list[0].update(True)
                 # print('Pressed Red')
                 score += 10
-       
+
             if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
                 yellow_notes_hit_list[0].update(True)
                 # print('Pressed Yellow')
                 score += 10
-       
+
             if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
                 blue_notes_hit_list[0].update(True)
                 # print('Pressed Blue')
                 score += 10
-       
+
     if len(all_notes_list) == 0:
         done = True
 
@@ -168,6 +170,7 @@ while not done:
     # Move notes down
     all_notes_list.update()
 
+    # pygame.draw.polygon(screen, line_color, polygon_points)
     draw_line(screen)
     all_sprites_list.draw(screen)
     draw_score(screen, str(score), 25)
