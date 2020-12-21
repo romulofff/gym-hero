@@ -5,7 +5,7 @@ from os import path
 import pygame
 from pygame import mixer
 
-from utils import draw_score
+from utils import draw_score, draw_line
 
 
 def EuclidianDistance(x1, y1, x2, y2):
@@ -168,6 +168,7 @@ while not done:
     # Move notes down
     all_notes_list.update()
 
+    draw_line(screen)
     all_sprites_list.draw(screen)
     draw_score(screen, str(score), 25)
     clock.tick(60)

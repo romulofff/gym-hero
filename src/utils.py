@@ -5,11 +5,11 @@ from pygame import draw
 def draw_line(screen):
     """ Draw the lines where the notes will roll """
     height = screen.get_height()
-    draw.line(screen, (100, 100, 100), (120, 0), (40, height), 3)
-    draw.line(screen, (100, 100, 100), (160, 0), (120, height), 3)
-    draw.line(screen, (100, 100, 100), (200, 0), (200, height), 3)
-    draw.line(screen, (100, 100, 100), (240, 0), (280, height), 3)
-    draw.line(screen, (100, 100, 100), (280, 0), (360, height), 3)
+    draw.line(screen, (100, 100, 100), (230, 0), (230, height), 3)
+    draw.line(screen, (100, 100, 100), (330, 0), (330, height), 3)
+    draw.line(screen, (100, 100, 100), (430, 0), (430, height), 3)
+    draw.line(screen, (100, 100, 100), (530, 0), (530, height), 3)
+    # draw.line(screen, (100, 100, 100), (0, 0), (360, height), 3)
 
 def draw_note_target(screen):
     """Draws the note target at the end of the track"""
