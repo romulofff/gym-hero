@@ -1,10 +1,19 @@
 import pygame
+import argparse
+
+
+def arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "chart_file",
+        help="Path to .CHART file.")
+    return parser.parse_args()
 
 
 DEFAULT_RESOLUTION = 192
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 960
+SCREEN_HEIGHT = 900
 
 color_x_pos = [192, 256, 320, 384, 448]
 
@@ -44,80 +53,84 @@ def draw_note_off(screen, color, position):
     pygame.draw.circle(screen, white_off, position, 11)
     
 
-# read file
-f = open('../charts/temp3.chart', 'r')
-chart_data = f.read().replace('  ', '')
-f.close()
+if __name__ == '__main__':
 
-search_string = '[ExpertSingle]\n{\n'
-inf = chart_data.find(search_string)
-sup = chart_data[inf:].find('}')
-
-sup += inf
-inf += len(search_string)
-
-notes_data = chart_data[inf:sup]
-
-notes = []
-
-for line in notes_data.splitlines():
-    n = line.split()
+    args = arg_parser()
     
-    if (n[2] == 'N'):
-        note = Note()
-        note.start = int(n[0])
-        note.color = int(n[3])
-        note.duration = int(n[4])
-        notes.append(note)
-    
+    # read file
+    f = open(args.chart_file, 'r')
+    chart_data = f.read().replace('  ', '')
+    f.close()
+
+    search_string = '[ExpertSingle]\n{\n'
+    inf = chart_data.find(search_string)
+    sup = chart_data[inf:].find('}')
+
+    sup += inf
+    inf += len(search_string)
+
+    notes_data = chart_data[inf:sup]
+
+    notes = []
+
+    for line in notes_data.splitlines():
+        n = line.split()
+        
+        if (n[2] == 'N'):
+            note = Note()
+            note.start = int(n[0])
+            note.color = int(n[3])
+            note.duration = int(n[4])
+            notes.append(note)
+        
 
 
-pygame.init()
+    pygame.init()
 
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-running = True
+    running = True
 
 
-while running:
+    while running:
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                
+        screen.fill((0, 0, 0))
+        
+        # draw guitar neck
+        pygame.draw.rect(screen, (50, 50, 50), (160, 0, 320, SCREEN_HEIGHT))
+        
+        # draw frets
+        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-0-30-2, 320, 4))
+        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-128-30-2, 320, 4))
+        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-256-30-2, 320, 4))
+        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-384-30-2, 320, 4))
+        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-512-30-2, 320, 4))
+        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-640-30-2, 320, 4))
+        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-768-30-2, 320, 4))
+        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-896-30-2, 320, 4))
+        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-1024-30-2, 320, 4))
+        
+        # neck borders
+        pygame.draw.rect(screen, (200, 200, 200), (140, 0, 20, SCREEN_HEIGHT))
+        pygame.draw.rect(screen, (200, 200, 200), (480, 0, 20, SCREEN_HEIGHT))
+        
+        for i in range(0, 5):
+            draw_note_off(screen, color_off[i], (color_x_pos[i], SCREEN_HEIGHT-0-30))
+        
+        for note in notes:
+            # TODO: change by song.resolution
+            y = 256 * note.start // DEFAULT_RESOLUTION
+            h = 256 * note.duration // DEFAULT_RESOLUTION
             
-    screen.fill((0, 0, 0))
-    
-    # draw guitar neck
-    pygame.draw.rect(screen, (50, 50, 50), (160, 0, 320, SCREEN_HEIGHT))
-    
-    # draw frets
-    pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-0-30-2, 320, 4))
-    pygame.draw.rect(screen, (120, 120, 120), (160, SCREEN_HEIGHT-128-30-2, 320, 4))
-    pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-256-30-2, 320, 4))
-    pygame.draw.rect(screen, (120, 120, 120), (160, SCREEN_HEIGHT-384-30-2, 320, 4))
-    pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-512-30-2, 320, 4))
-    pygame.draw.rect(screen, (120, 120, 120), (160, SCREEN_HEIGHT-640-30-2, 320, 4))
-    pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-768-30-2, 320, 4))
-    pygame.draw.rect(screen, (120, 120, 120), (160, SCREEN_HEIGHT-896-30-2, 320, 4))
-    pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-1024-30-2, 320, 4))
-    
-    # neck borders
-    pygame.draw.rect(screen, (200, 200, 200), (140, 0, 20, SCREEN_HEIGHT))
-    pygame.draw.rect(screen, (200, 200, 200), (480, 0, 20, SCREEN_HEIGHT))
-    
-    for i in range(0, 5):
-        draw_note_off(screen, color_off[i], (color_x_pos[i], SCREEN_HEIGHT-0-30))
-    
-    for note in notes:
-        # TODO: change by song.resolution
-        y = 256 * note.start // DEFAULT_RESOLUTION
-        h = 256 * note.duration // DEFAULT_RESOLUTION
+            pygame.draw.rect(screen, color_on[note.color], (color_x_pos[note.color]-10, SCREEN_HEIGHT-y-30-h, 20, h))
+            draw_note_on(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
+            
+        pygame.display.flip()
         
-        pygame.draw.rect(screen, color_on[note.color], (color_x_pos[note.color]-10, SCREEN_HEIGHT-y-30-h, 20, h))
-        draw_note_on(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
         
-    pygame.display.flip()
-    
-    
-pygame.quit()
+    pygame.quit()
 
