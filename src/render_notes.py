@@ -45,7 +45,7 @@ def draw_note_off(screen, color, position):
     
 
 # read file
-f = open('../charts/temp.chart', 'r')
+f = open('../charts/temp3.chart', 'r')
 chart_data = f.read().replace('  ', '')
 f.close()
 
@@ -111,6 +111,9 @@ while running:
     for note in notes:
         # TODO: change by song.resolution
         y = 256 * note.start // DEFAULT_RESOLUTION
+        h = 256 * note.duration // DEFAULT_RESOLUTION
+        
+        pygame.draw.rect(screen, color_on[note.color], (color_x_pos[note.color]-10, SCREEN_HEIGHT-y-30-h, 20, h))
         draw_note_on(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
         
     pygame.display.flip()
