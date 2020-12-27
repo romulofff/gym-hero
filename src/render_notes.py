@@ -57,6 +57,7 @@ if __name__ == '__main__':
 
     args = arg_parser()
     
+    
     # read file
     f = open(args.chart_file, 'r')
     chart_data = f.read().replace('  ', '')
@@ -92,11 +93,21 @@ if __name__ == '__main__':
     running = True
 
 
+    global_y_offset = 0
+        
     while running:
-
+    
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                
+        pressed_keys = pygame.key.get_pressed()
+                
+        if pressed_keys[pygame.K_UP]:
+            global_y_offset -= 1
+            
+        if pressed_keys[pygame.K_DOWN]:
+            global_y_offset += 1
                 
         screen.fill((0, 0, 0))
         
@@ -104,26 +115,23 @@ if __name__ == '__main__':
         pygame.draw.rect(screen, (50, 50, 50), (160, 0, 320, SCREEN_HEIGHT))
         
         # draw frets
-        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-0-30-2, 320, 4))
-        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-128-30-2, 320, 4))
-        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-256-30-2, 320, 4))
-        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-384-30-2, 320, 4))
-        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-512-30-2, 320, 4))
-        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-640-30-2, 320, 4))
-        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-768-30-2, 320, 4))
-        pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-896-30-2, 320, 4))
-        pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-1024-30-2, 320, 4))
+        for i in range(5):
+            y_offset = (i * 256) + global_y_offset
+            pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-y_offset-30-2, 320, 4))
+            pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-y_offset+128-30-2, 320, 4))
         
         # neck borders
         pygame.draw.rect(screen, (200, 200, 200), (140, 0, 20, SCREEN_HEIGHT))
         pygame.draw.rect(screen, (200, 200, 200), (480, 0, 20, SCREEN_HEIGHT))
         
+        # draw base notes
         for i in range(0, 5):
             draw_note_off(screen, color_off[i], (color_x_pos[i], SCREEN_HEIGHT-0-30))
         
+        # draw song notes
         for note in notes:
             # TODO: change by song.resolution
-            y = 256 * note.start // DEFAULT_RESOLUTION
+            y = (256 * note.start // DEFAULT_RESOLUTION) + global_y_offset
             h = 256 * note.duration // DEFAULT_RESOLUTION
             
             pygame.draw.rect(screen, color_on[note.color], (color_x_pos[note.color]-10, SCREEN_HEIGHT-y-30-h, 20, h))
