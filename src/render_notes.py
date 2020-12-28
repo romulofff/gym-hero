@@ -94,11 +94,40 @@ if __name__ == '__main__':
     f = open(args.chart_file, 'r')
     chart_data = f.read().replace('  ', '')
     f.close()
+    
+    # load song info
+    search_string = '[Song]\n{\n'
+    inf = chart_data.find(search_string)
+    sup = chart_data[inf:].find('}')
+    sup += inf
+    inf += len(search_string)
+    
+    song_data = chart_data[inf:sup]
+    
+    song_offset = 0
+    song_resolution = DEFAULT_RESOLUTION
+    song_name = ''
+    song_guitar = ''
+    
+    for line in song_data.splitlines():
+        info = line.split()
+        
+        if (info[0] == 'Offset'):
+            song_offset = int(info[2])
+            
+        if (info[0] == 'Resolution'):
+            song_resolution = int(info[2])
+            
+        if (info[0] == 'MusicStream'):
+            song_name = info[2]
+            
+        if (info[0] == 'GuitarStream'):
+            song_guitar = info[2]
 
+    # load notes
     search_string = '[ExpertSingle]\n{\n'
     inf = chart_data.find(search_string)
     sup = chart_data[inf:].find('}')
-
     sup += inf
     inf += len(search_string)
 
@@ -135,7 +164,6 @@ if __name__ == '__main__':
                 s += 2
                 i -= 1
             
-
     pygame.init()
 
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -158,8 +186,6 @@ if __name__ == '__main__':
             
         if pressed_keys[pygame.K_DOWN]:
             global_y_offset += 1
-        
-        #global_y_offset -= 1
                 
         screen.fill((0, 0, 0))
         
@@ -182,9 +208,8 @@ if __name__ == '__main__':
         
         # draw song notes
         for note in notes:
-            # TODO: change by song.resolution
-            y = (256 * note.start // DEFAULT_RESOLUTION) + global_y_offset
-            h = 256 * note.duration // DEFAULT_RESOLUTION
+            y = (256 * note.start // song_resolution) + global_y_offset
+            h = 256 * note.duration // song_resolution
             
             pygame.draw.rect(screen, color_on[note.color], (color_x_pos[note.color]-10, SCREEN_HEIGHT-y-30-h, 20, h))
             
@@ -193,10 +218,7 @@ if __name__ == '__main__':
             else:
                 draw_star_note(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
                 
-        
-        #draw_star_note(screen, color_on[4], (color_x_pos[4], SCREEN_HEIGHT-64-30))
-        #draw_star_note(screen, color_on[4], (color_x_pos[4], SCREEN_HEIGHT-256-30))
-            
+                    
         pygame.display.flip()
         
         
