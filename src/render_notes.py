@@ -52,6 +52,38 @@ def draw_note_off(screen, color, position):
     pygame.draw.circle(screen, black, position, 14)
     pygame.draw.circle(screen, white_off, position, 11)
     
+def draw_star_note(screen, color, position):
+    draw_star(screen, white_on, position, 30)
+    draw_star(screen, color, position, 26)
+    draw_star(screen, black, position, 14)
+    draw_star(screen, white_on, position, 9)
+    
+def draw_star(screen, color, position, radius):
+    r_in = int(0.65 * radius)
+    r_out = radius + 2
+        
+    points_out = [
+    (0+position[0], -r_out+position[1]), 
+    (int(0.951*r_out)+position[0], int(-0.309*r_out)+position[1]), 
+    (int(0.588*r_out)+position[0], int(0.809*r_out)+position[1]), 
+    (int(-0.588*r_out)+position[0], int(0.809*r_out)+position[1]), 
+    (int(-0.951*r_out)+position[0], int(-0.309*r_out)+position[1])]
+        
+    points_in = [
+    (int(0.588*r_in)+position[0], int(-0.809*r_in)+position[1]),
+    (int(0.951*r_in)+position[0], int(0.309*r_in)+position[1]), 
+    (0+position[0], r_in+position[1]),
+    (int(-0.951*r_in)+position[0], int(0.309*r_in)+position[1]),
+    (int(-0.588*r_in)+position[0], int(-0.809*r_in)+position[1])]
+    
+    points = []
+    
+    for i in range(5):
+        points.append(points_out[i])
+        points.append(points_in[i])
+       
+    pygame.draw.polygon(screen, color, points)
+
 
 if __name__ == '__main__':
 
@@ -73,6 +105,7 @@ if __name__ == '__main__':
     notes_data = chart_data[inf:sup]
 
     notes = []
+    stars = []
 
     for line in notes_data.splitlines():
         n = line.split()
@@ -84,7 +117,24 @@ if __name__ == '__main__':
             note.duration = int(n[4])
             notes.append(note)
         
-
+        if (n[2] == 'S'):
+            stars.append(int(n[0]))
+            stars.append(int(n[0])+int(n[4]))
+            
+    # set stars
+    s = 0
+    
+    for i in range(len(notes)):
+        if (s >= len(stars)):
+            break
+            
+        if (notes[i].start >= stars[s]):
+            if (notes[i].start <= stars[s+1]):
+                notes[i].type = 1
+            else:
+                s += 2
+                i -= 1
+            
 
     pygame.init()
 
@@ -102,12 +152,14 @@ if __name__ == '__main__':
                 running = False
                 
         pressed_keys = pygame.key.get_pressed()
-                
+        
         if pressed_keys[pygame.K_UP]:
             global_y_offset -= 1
             
         if pressed_keys[pygame.K_DOWN]:
             global_y_offset += 1
+        
+        #global_y_offset -= 1
                 
         screen.fill((0, 0, 0))
         
@@ -135,7 +187,15 @@ if __name__ == '__main__':
             h = 256 * note.duration // DEFAULT_RESOLUTION
             
             pygame.draw.rect(screen, color_on[note.color], (color_x_pos[note.color]-10, SCREEN_HEIGHT-y-30-h, 20, h))
-            draw_note_on(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
+            
+            if note.type == 0:
+                draw_note_on(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
+            else:
+                draw_star_note(screen, color_on[note.color], (color_x_pos[note.color], SCREEN_HEIGHT-y-30))
+                
+        
+        #draw_star_note(screen, color_on[4], (color_x_pos[4], SCREEN_HEIGHT-64-30))
+        #draw_star_note(screen, color_on[4], (color_x_pos[4], SCREEN_HEIGHT-256-30))
             
         pygame.display.flip()
         
