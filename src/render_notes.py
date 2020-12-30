@@ -140,6 +140,8 @@ if __name__ == '__main__':
         n = line.split()
         
         if (n[2] == 'N'):
+            if (int(n[3]) == 5):
+                continue
             note = Note()
             note.start = int(n[0])
             note.color = int(n[3])
@@ -182,10 +184,10 @@ if __name__ == '__main__':
         pressed_keys = pygame.key.get_pressed()
         
         if pressed_keys[pygame.K_UP]:
-            global_y_offset -= 1
+            global_y_offset -= 10
             
         if pressed_keys[pygame.K_DOWN]:
-            global_y_offset += 1
+            global_y_offset += 10
                 
         screen.fill((0, 0, 0))
         
@@ -193,7 +195,7 @@ if __name__ == '__main__':
         pygame.draw.rect(screen, (50, 50, 50), (160, 0, 320, SCREEN_HEIGHT))
         
         # draw frets
-        for i in range(5):
+        for i in range(500):
             y_offset = (i * 256) + global_y_offset
             pygame.draw.rect(screen, (180, 180, 180), (160, SCREEN_HEIGHT-y_offset-30-2, 320, 4))
             pygame.draw.rect(screen, (100, 100, 100), (160, SCREEN_HEIGHT-y_offset+128-30-2, 320, 4))

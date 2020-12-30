@@ -1,6 +1,4 @@
 import argparse
-import math
-import random
 from os import path
 
 import pygame
@@ -75,12 +73,12 @@ class Note(pygame.sprite.Sprite):
 
             y = (256 * note.start // song_resolution) + global_y_offset
 
-
+            global_offset tem que ser atualizado também (ele que move as notas)
         """
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
 
-        self.rect.y += 1
+        self.rect.y += (256 * self.start // song_resolution) + global_y_offset
 
 
 def create_buttons(imgs):
@@ -255,7 +253,12 @@ if __name__ == "__main__":
                     score += 10
 
         # Move notes down
+        # global_y_offset += .01
         all_notes_list.update()
+
+        # # If there are no more notes, end the game
+        # if len(all_notes_list) == 0:
+        #     running = False
 
         # Draw Phase
         screen.fill((0, 0, 0))
