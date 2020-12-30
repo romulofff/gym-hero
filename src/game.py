@@ -9,6 +9,9 @@ from pygame import mixer
 from utils import draw_line, draw_score
 
 DEFAULT_RESOLUTION = 192
+FRET_HEIGHT = 256
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 900
 
 def arg_parser():
     parser = argparse.ArgumentParser()
@@ -17,18 +20,43 @@ def arg_parser():
         help="Path to .CHART file.")
     return parser.parse_args()
 
+def load_imgs():
+    greenImg = pygame.image.load(
+        path.join('..', 'assets', 'greenbutton.png')).convert()
+
+    redImg = pygame.image.load(
+        path.join('..', 'assets', 'redbutton.png')).convert()
+
+    yellowImg = pygame.image.load(
+        path.join('..', 'assets', 'yellowbutton.png')).convert()
+
+    blueImg = pygame.image.load(
+        path.join('..', 'assets', 'bluebutton.png')).convert()
+
+    imgs = [greenImg, redImg, yellowImg, blueImg]
+    return imgs
+
 class Note(pygame.sprite.Sprite):
-    def __init__(self, img):
+    def __init__(self):
         super().__init__()
         self.start = 0
         self.type = 0 # 0 = normal note, 1 = star
         self.color = 0
         self.duration = 0
-        self.image = img
+        self.__set_image(self.color)
+
+    def __set_image(self, img):
+        self.image = imgs[img]
         self.image.set_colorkey((0, 0, 0))
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
         # print(self.rect)
+    
+    def update_color(self, color):
+        self.color = color
+        print(self.color)
+        self.__set_image(self.color)
+
     def __repr__(self):
         return f'<Note start:{self.start} type:{self.type} color:{self.color} duration:{self.duration}>'
         
@@ -61,71 +89,69 @@ class Button(pygame.sprite.Sprite):
             self.rect.x = 500
 
 
-pygame.init()
-screen_width = 800
-screen_height = 600
-screen = pygame.display.set_mode((screen_width, screen_height))
+# pygame.init()
+# screen_width = 800
+# screen_height = 600
+# screen = pygame.display.set_mode((screen_width, screen_height))
 
-redImg = pygame.image.load(
-    path.join('..', 'assets', 'redbutton.png')).convert()
-
-green_notes_list = pygame.sprite.Group()
-red_notes_list = pygame.sprite.Group()
-yellow_notes_list = pygame.sprite.Group()
-blue_notes_list = pygame.sprite.Group()
-all_notes_list = pygame.sprite.Group()
-all_sprites_list = pygame.sprite.Group()
+# green_notes_list = pygame.sprite.Group()
+# red_notes_list = pygame.sprite.Group()
+# yellow_notes_list = pygame.sprite.Group()
+# blue_notes_list = pygame.sprite.Group()
+# all_notes_list = pygame.sprite.Group()
+# all_sprites_list = pygame.sprite.Group()
 
 
 # GreenFret
 greenImg = pygame.image.load(
     path.join('..', 'assets', 'greenbutton.png')).convert()
-greenFret = Button(greenImg, 'green')
-all_sprites_list.add(greenFret)
+greenButton = Button(greenImg, 'green')
+all_sprites_list.add(greenButton)
 
 # RedFret
 redImg = pygame.image.load(
     path.join('..', 'assets', 'redbutton.png')).convert()
-redFret = Button(redImg, 'red')
-all_sprites_list.add(redFret)
+redButton = Button(redImg, 'red')
+all_sprites_list.add(redButton)
 
 # YellowFret
 yellowImg = pygame.image.load(
     path.join('..', 'assets', 'yellowbutton.png')).convert()
-yellowFret = Button(yellowImg, 'yellow')
-all_sprites_list.add(yellowFret)
+yellowButton = Button(yellowImg, 'yellow')
+all_sprites_list.add(yellowButton)
 
 # BlueFret
 blueImg = pygame.image.load(
     path.join('..', 'assets', 'bluebutton.png')).convert()
-blueFret = Button(blueImg, 'blue')
-all_sprites_list.add(blueFret)
+blueButton = Button(blueImg, 'blue')
+all_sprites_list.add(blueButton)
+imgs = load_imgs()
 
-for i in range(50):
-    rect_x = random.choice([200, 300, 400, 500])  # choose note color
-    if rect_x == 200:
-        note = Note(greenImg)
-        note.rect.x = rect_x
-        note.rect.y = random.uniform(-600*3, -60)
-        green_notes_list.add(note)
-    if rect_x == 300:
-        note = Note(redImg)
-        note.rect.x = rect_x
-        note.rect.y = random.uniform(-600*3, -60)
-        red_notes_list.add(note)
-    if rect_x == 400:
-        note = Note(yellowImg)
-        note.rect.x = rect_x
-        note.rect.y = random.uniform(-600*3, -60)
-        yellow_notes_list.add(note)
-    if rect_x == 500:
-        note = Note(blueImg)
-        note.rect.x = rect_x
-        note.rect.y = random.uniform(-600*3, -60)
-        blue_notes_list.add(note)
+# for i in range(5):
+#     rect_x = random.choice([200, 300, 400, 500])  # choose note color
+#     if rect_x == 200:
+#         note = Note()
+#         note.rect.x = rect_x
+#         note.rect.y = random.uniform(-600*3, -60)
+#         green_notes_list.add(note)
+#     if rect_x == 300:
+#         note = Note()
+#         note.rect.x = rect_x
+#         note.rect.y = random.uniform(-600*3, -60)
+#         red_notes_list.add(note)
+#     if rect_x == 400:
+#         note = Note()
+#         note.rect.x = rect_x
+#         note.rect.y = random.uniform(-600*3, -60)
+#         yellow_notes_list.add(note)
+#     if rect_x == 500:
+#         note = Note()
+#         note.rect.x = rect_x
+#         note.rect.y = random.uniform(-600*3, -60)
+#         blue_notes_list.add(note)
 
-    all_notes_list.add(note)
-    all_sprites_list.add(note)
+#     all_notes_list.add(note)
+#     all_sprites_list.add(note)
 
 # Game Loop
 clock = pygame.time.Clock()
@@ -133,60 +159,64 @@ score = 0
 done = False
 # line_color = (128, 128, 128)
 # polygon_points = [(150, 0), (600, 0), (600, screen_height), (150, screen_height)]
-while not done:
-    green_notes_hit_list = pygame.sprite.spritecollide(
-        greenFret, green_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
-    red_notes_hit_list = pygame.sprite.spritecollide(
-        redFret, red_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
-    yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowFret, yellow_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
-    blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueFret, blue_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+# while not done:
+#     green_notes_hit_list = pygame.sprite.spritecollide(
+#         greenButton, green_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+#     red_notes_hit_list = pygame.sprite.spritecollide(
+#         redButton, red_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+#     yellow_notes_hit_list = pygame.sprite.spritecollide(
+#         yellowButton, yellow_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+#     blue_notes_hit_list = pygame.sprite.spritecollide(
+#         blueButton, blue_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
-                green_notes_hit_list[0].update(True)
-                # print('Pressed Green')
-                score += 10
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             done = True
+#         if event.type == pygame.KEYDOWN:
+#             if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
+#                 green_notes_hit_list[0].update(True)
+#                 # print('Pressed Green')
+#                 score += 10
 
-            if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
-                red_notes_hit_list[0].update(True)
-                # print('Pressed Red')
-                score += 10
+#             if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
+#                 red_notes_hit_list[0].update(True)
+#                 # print('Pressed Red')
+#                 score += 10
 
-            if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
-                yellow_notes_hit_list[0].update(True)
-                # print('Pressed Yellow')
-                score += 10
+#             if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
+#                 yellow_notes_hit_list[0].update(True)
+#                 # print('Pressed Yellow')
+#                 score += 10
 
-            if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
-                blue_notes_hit_list[0].update(True)
-                # print('Pressed Blue')
-                score += 10
+#             if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
+#                 blue_notes_hit_list[0].update(True)
+#                 # print('Pressed Blue')
+#                 score += 10
 
-    if len(all_notes_list) == 0:
-        done = True
+#     if len(all_notes_list) == 0:
+#         done = True
 
-    screen.fill((0, 0, 0))
+#     screen.fill((0, 0, 0))
 
-    # Move notes down
-    all_notes_list.update()
+#     # Move notes down
+#     all_notes_list.update()
 
-    # pygame.draw.polygon(screen, line_color, polygon_points)
-    draw_line(screen)
-    all_sprites_list.draw(screen)
-    draw_score(screen, str(score), 25)
-    clock.tick(60)
-    pygame.display.flip()
+#     # pygame.draw.polygon(screen, line_color, polygon_points)
+#     draw_line(screen)
+#     all_sprites_list.draw(screen)
+#     draw_score(screen, str(score), 25)
+#     clock.tick(60)
+#     pygame.display.flip()
 
 pygame.quit()
 
 
 if __name__ == "__main__":
     
+    pygame.init()
+    screen_width = 800
+    screen_height = 600
+    screen = pygame.display.set_mode((screen_width, screen_height))
     args = arg_parser()
     
     # read file
@@ -236,3 +266,92 @@ if __name__ == "__main__":
     inf += len(search_string)
 
     notes_data = chart_data[inf:sup]
+    notes = []
+    stars = []
+
+    imgs = load_imgs()
+    all_notes_list = pygame.sprite.Group()
+
+    for line in notes_data.splitlines():
+        n = line.split()
+        
+        if (n[2] == 'N'):
+            if (int(n[3]) == 5):
+                continue
+            note = Note()
+            note.start = int(n[0])
+            # note.color = int(n[3])
+            note.duration = int(n[4])
+            note.update_color(int(n[3]))
+            notes.append(note)
+            all_notes_list.add(note)
+
+        if (n[2] == 'S'):
+            stars.append(int(n[0]))
+            stars.append(int(n[0])+int(n[4]))
+
+    # set stars
+    s = 0
+    
+    for i in range(len(notes)):
+        if (s >= len(stars)):
+            break
+            
+        if (notes[i].start >= stars[s]):
+            if (notes[i].start <= stars[s+1]):
+                notes[i].type = 1
+            else:
+                s += 2
+                i -= 1
+
+
+    # Game Loop
+    score = 0
+    running = True
+    clock = pygame.time.Clock()
+
+    while running:
+        # Check for collisions
+        green_notes_hit_list = pygame.sprite.spritecollide(
+            greenButton, green_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+        red_notes_hit_list = pygame.sprite.spritecollide(
+            redButton, red_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+        yellow_notes_hit_list = pygame.sprite.spritecollide(
+            yellowButton, yellow_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+        blue_notes_hit_list = pygame.sprite.spritecollide(
+            blueButton, blue_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+
+        if event.type == pygame.QUIT:
+            done = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
+                green_notes_hit_list[0].update(True)
+                # print('Pressed Green')
+                score += 10
+
+            if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
+                red_notes_hit_list[0].update(True)
+                # print('Pressed Red')
+                score += 10
+
+            if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
+                yellow_notes_hit_list[0].update(True)
+                # print('Pressed Yellow')
+                score += 10
+
+            if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
+                blue_notes_hit_list[0].update(True)
+                # print('Pressed Blue')
+                score += 10
+        
+        screen.fill((0, 0, 0))
+        # draw guitar neck
+        pygame.draw.rect(screen, (50, 50, 50), (160, 0, 320, SCREEN_HEIGHT))
+        
+
+        # Move notes down
+        all_notes_list.update()
+        all_notes_list.draw(screen)
+        draw_score(screen, str(score), 25)
+        clock.tick(60)
+        pygame.display.flip()
