@@ -20,13 +20,21 @@ def arg_parser():
 class Note(pygame.sprite.Sprite):
     def __init__(self, img):
         super().__init__()
-
+        self.start = 0
+        self.type = 0 # 0 = normal note, 1 = star
+        self.color = 0
+        self.duration = 0
         self.image = img
         self.image.set_colorkey((0, 0, 0))
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
         # print(self.rect)
-
+    def __repr__(self):
+        return f'<Note start:{self.start} type:{self.type} color:{self.color} duration:{self.duration}>'
+        
+    def __str__(self):
+        return f'Note: start={self.start}, type={self.type}, color={self.color}, duration={self.duration}'
+    
     def update(self, to_kill=None):
         if self.rect.y > screen_height + 60 or to_kill == True:
             self.kill()
@@ -34,7 +42,7 @@ class Note(pygame.sprite.Sprite):
         self.rect.y += 1
 
 
-class Fret(pygame.sprite.Sprite):
+class Button(pygame.sprite.Sprite):
     def __init__(self, img, color):
         super().__init__()
 
@@ -72,25 +80,25 @@ all_sprites_list = pygame.sprite.Group()
 # GreenFret
 greenImg = pygame.image.load(
     path.join('..', 'assets', 'greenbutton.png')).convert()
-greenFret = Fret(greenImg, 'green')
+greenFret = Button(greenImg, 'green')
 all_sprites_list.add(greenFret)
 
 # RedFret
 redImg = pygame.image.load(
     path.join('..', 'assets', 'redbutton.png')).convert()
-redFret = Fret(redImg, 'red')
+redFret = Button(redImg, 'red')
 all_sprites_list.add(redFret)
 
 # YellowFret
 yellowImg = pygame.image.load(
     path.join('..', 'assets', 'yellowbutton.png')).convert()
-yellowFret = Fret(yellowImg, 'yellow')
+yellowFret = Button(yellowImg, 'yellow')
 all_sprites_list.add(yellowFret)
 
 # BlueFret
 blueImg = pygame.image.load(
     path.join('..', 'assets', 'bluebutton.png')).convert()
-blueFret = Fret(blueImg, 'blue')
+blueFret = Button(blueImg, 'blue')
 all_sprites_list.add(blueFret)
 
 for i in range(50):
@@ -127,13 +135,13 @@ done = False
 # polygon_points = [(150, 0), (600, 0), (600, screen_height), (150, screen_height)]
 while not done:
     green_notes_hit_list = pygame.sprite.spritecollide(
-        greenFret, green_notes_list, False)
+        greenFret, green_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
     red_notes_hit_list = pygame.sprite.spritecollide(
-        redFret, red_notes_list, False)
+        redFret, red_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
     yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowFret, yellow_notes_list, False)
+        yellowFret, yellow_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
     blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueFret, blue_notes_list, False)
+        blueFret, blue_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
