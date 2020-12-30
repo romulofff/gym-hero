@@ -78,8 +78,8 @@ class Note(pygame.sprite.Sprite):
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
 
-        self.rect.y += (256 * self.start // song_resolution) + global_y_offset
-
+        # self.rect.y += (256 * self.start // song_resolution) + global_y_offset
+        self.rect.y += 1
 
 def create_buttons(imgs):
     greenButton = Button(imgs[0], 'green')
@@ -169,10 +169,6 @@ if __name__ == "__main__":
     stars = []
 
     imgs = load_imgs()
-    green_notes_list = pygame.sprite.Group()
-    red_notes_list = pygame.sprite.Group()
-    yellow_notes_list = pygame.sprite.Group()
-    blue_notes_list = pygame.sprite.Group()
     all_notes_list = pygame.sprite.Group()
     all_sprites_list = pygame.sprite.Group()
     greenButton, redButton, yellowButton, blueButton = create_buttons(imgs)
@@ -181,7 +177,7 @@ if __name__ == "__main__":
         n = line.split()
 
         if (n[2] == 'N'):
-            if (int(n[3]) > 3):
+            if (int(n[3]) > 3): # TODO: Add Orange notes
                 continue
             note = Note()
             note.start = int(n[0])
@@ -220,13 +216,13 @@ if __name__ == "__main__":
     while running:
         # Check for collisions
         green_notes_hit_list = pygame.sprite.spritecollide(
-            greenButton, green_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+            greenButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
         red_notes_hit_list = pygame.sprite.spritecollide(
-            redButton, red_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+            redButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
         yellow_notes_hit_list = pygame.sprite.spritecollide(
-            yellowButton, yellow_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+            yellowButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
         blue_notes_hit_list = pygame.sprite.spritecollide(
-            blueButton, blue_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
+            blueButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.2))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -234,7 +230,7 @@ if __name__ == "__main__":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
                     green_notes_hit_list[0].update(True)
-                    print('Pressed Green')
+                    # print('Pressed Green')
                     score += 10
 
                 if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
