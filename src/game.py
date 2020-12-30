@@ -1,3 +1,4 @@
+import argparse
 import math
 import random
 from os import path
@@ -7,18 +8,14 @@ from pygame import mixer
 
 from utils import draw_line, draw_score
 
+DEFAULT_RESOLUTION = 192
 
-def EuclidianDistance(x1, y1, x2, y2):
-    return math.sqrt((math.pow(x1-x2, 2)) + (math.pow(y1 - y2, 2)))
-
-
-def Collision(noteX, noteY, ButtonX, ButtonY):
-    distance = EuclidianDistance(noteX, noteY, ButtonX, ButtonY)
-    if distance < 72:
-        return True
-    else:
-        return False
-
+def arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "chart_file",
+        help="Path to .CHART file.")
+    return parser.parse_args()
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, img):
@@ -178,3 +175,56 @@ while not done:
     pygame.display.flip()
 
 pygame.quit()
+
+
+if __name__ == "__main__":
+    
+    args = arg_parser()
+    
+    # read file
+    f = open(args.chart_file, 'r')
+    chart_data = f.read().replace('  ', '')
+    f.close()
+   
+   # read file
+    f = open(args.chart_file, 'r')
+    chart_data = f.read().replace('  ', '')
+    f.close()
+    
+    # load song info
+    search_string = '[Song]\n{\n'
+    inf = chart_data.find(search_string)
+    sup = chart_data[inf:].find('}')
+    sup += inf
+    inf += len(search_string)
+    
+    song_data = chart_data[inf:sup]
+    
+    song_offset = 0
+    song_resolution = DEFAULT_RESOLUTION
+    song_name = ''
+    song_guitar = ''
+
+    for line in song_data.splitlines():
+        info = line.split()
+        
+        if (info[0] == 'Offset'):
+            song_offset = int(info[2])
+            
+        if (info[0] == 'Resolution'):
+            song_resolution = int(info[2])
+            
+        if (info[0] == 'MusicStream'):
+            song_name = info[2]
+            
+        if (info[0] == 'GuitarStream'):
+            song_guitar = info[2]
+
+    # load notes
+    search_string = '[ExpertSingle]\n{\n'
+    inf = chart_data.find(search_string)
+    sup = chart_data[inf:].find('}')
+    sup += inf
+    inf += len(search_string)
+
+    notes_data = chart_data[inf:sup]
