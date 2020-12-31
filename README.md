@@ -14,3 +14,19 @@ Informações para serem retornadas:
 + Pontuação total
 
 Tendo esse ambiente, desenvolver um agente de aprendizagem por reforço que aprenda a jogar guitar hero :)
+
+
+## How to run it:
+Após clonar o repositório, entre na pasta do projeto usando um terminal e digite os seguintes comandos:
+```
+virtualenv venv --python=python3
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+Em seguida entre na pasta src e digite:
+```
+python game.py
+```
