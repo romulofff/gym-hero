@@ -35,9 +35,9 @@ def draw_note_target(screen):
 
 font_name = pygame.font.match_font('arial')
 white = (255, 255, 255)
-def draw_score(score_screen, score_points, size, screen_width):
+def draw_score(score_screen, score_points, size, x_position):
     """ Draws score points on the screen """
-    _x = screen_width - 100
+    _x = x_position
     _y = 50
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(score_points, True, white)
