@@ -7,7 +7,6 @@ from pygame import mixer
 
 from utils import draw_line, draw_score
 
-
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 900
@@ -229,17 +228,20 @@ def render(screen, render_interval, score):
 def update(score):
     global game_is_running
 
+    # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
+    visible_notes_list.add(all_notes_list.sprites()[:50])
+
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
 
     for event in pygame.event.get():
 
