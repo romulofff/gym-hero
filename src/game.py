@@ -88,7 +88,7 @@ def create_button(img, x_pos):
     button = pygame.sprite.Sprite()
     button.image = pygame.transform.scale(img, (60, 60))
     button.rect = button.image.get_rect()
-    button.rect.y = SCREEN_HEIGHT-60
+    button.rect.y = SCREEN_HEIGHT-90
     button.rect.x = x_pos
     return button
 
