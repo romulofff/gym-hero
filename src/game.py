@@ -167,7 +167,7 @@ def load_notes(chart_data, song, imgs):
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
             # TODO: checar se eh msm 240
-            note.rect.y = -(240 * note.start // song.resolution)
+            note.rect.y = -(300 * note.start // song.resolution)
             notes.append(note)
 
         if (n[2] == 'S'):
@@ -229,7 +229,7 @@ def update(score):
     global game_is_running
 
     # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
-    visible_notes_list.add(all_notes_list.sprites()[:50])
+    visible_notes_list.add(all_notes_list.sprites()[300::-1])
 
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
