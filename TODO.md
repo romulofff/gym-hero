@@ -3,26 +3,30 @@
 ### MÚSICA:
 Preciso ler um 'chart' correspondente a alguma música e reproduzir as notas e os sons.
 - Ler os charts [FEITO]
-- As notas são renderizadas no tempo certo de acordo com o chart [FEITO]
-- Falta colocar a música pra tocar junto
-
-<!-- - [Subreddit do Clone Hero](https://www.reddit.com/r/CloneHero/comments/7caylm/how_to_install_clone_hero_and_all_the_files_you/) -->
-<!-- - [Lista de músicas para download](https://docs.google.com/spreadsheets/d/13B823ukxdVMocowo1s5XnT3tzciOfruhUVePENKc01o/htmlview?usp=drive_web) -->
+- Criar e Renderizar notas de acordo com o chart [FEITO]
+- Separar a lista de colisão da lista de notas renderizadas
+- Música deve tocar junto
+- Implementar notas longas
+- Implementar notas estrela
+- Implementar o TS
+- Ajustar o BPM
 
 ### DETECÇÃO DE COLISÃO [FEITO]:
 Preciso detectar quando a nota colidir com o botão. Isso deve acontecer, caso o jogador clique no botão correto quando a nota estiver passando pelo botão.
-- Reconhecer as teclas ('a', 's', 'd', 'f', 'g') referentes aos botões FEITO 
-- Detectar a colisão FEITO
+- Reconhecer as teclas ('a', 's', 'd', 'f', 'g') referentes aos botões [FEITO] 
+- Detectar a colisão [FEITO]
 
 ### SCORE POINTS:
-- Melhorias gerais
-- Atualizar valor quando houver colisão
+- Atualizar valor quando houver colisão [FEITO]
+- Opção para diminuir caso o jogador erre
+- Implementar multiplicador
 
-### JANELA DESLIZANTE:
-- Criar imagem de track
-- Criar janela delizante
-- Transformar perspectiva
-    - Retânagulo --> Trapézio
+### PÚBLICO:
+A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o público fica insatisfeito e te expulsa do palco (com vaias e xingamentos)
+- Implementar Torcida
+
+### AMBIENTE GYM:
+- Implementar ambiente GYM
 
 ### TESTE DE FEATURES
 - Poder retornar o array de screen buffer, label buffer e depth buffer (se tiver)
@@ -40,10 +44,5 @@ Preciso detectar quando a nota colidir com o botão. Isso deve acontecer, caso o
 - Modo multiplayer
 
 
-### Lógica de Colisão (Sugestão Hyuan)
-Para cada nota e Para cada traste
-No intervalo de tempo em que a nota e o traste estão colidindo (bouding boxes cruzando) ativar varíavel de estado booleana. 
-- Se a variável de estado E a tecla pressionada: HIT OK
-- Se a variável de estado E não a tecla pressionada: HIT MISS
-- Se não a variável de estado E a tecla pressionada: HIT MISS
-- Se não a variável de estado E não a tecla pressionada: PASS
+<!-- - [Subreddit do Clone Hero](https://www.reddit.com/r/CloneHero/comments/7caylm/how_to_install_clone_hero_and_all_the_files_you/) -->
+<!-- - [Lista de músicas para download](https://docs.google.com/spreadsheets/d/13B823ukxdVMocowo1s5XnT3tzciOfruhUVePENKc01o/htmlview?usp=drive_web) -->
