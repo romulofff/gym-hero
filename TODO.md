@@ -19,7 +19,7 @@ Preciso detectar quando a nota colidir com o botão. Isso deve acontecer, caso o
 ### SCORE POINTS:
 - Atualizar valor quando houver colisão [FEITO]
 - Opção para diminuir caso o jogador erre
-- Implementar multiplicador
+- Implementar multiplicador (a cada 10 notas aumenta em 1, máximo x4)
 
 ### PÚBLICO:
 A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o público fica insatisfeito e te expulsa do palco (com vaias e xingamentos)
@@ -45,4 +45,3 @@ A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o 
 
 
 <!-- - [Subreddit do Clone Hero](https://www.reddit.com/r/CloneHero/comments/7caylm/how_to_install_clone_hero_and_all_the_files_you/) -->
-<!-- - [Lista de músicas para download](https://docs.google.com/spreadsheets/d/13B823ukxdVMocowo1s5XnT3tzciOfruhUVePENKc01o/htmlview?usp=drive_web) -->

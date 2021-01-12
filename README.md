@@ -30,3 +30,6 @@ Em seguida entre na pasta src e digite:
 ```
 python game.py
 ```
+
+## References:
+- [List of songs to download](https://docs.google.com/spreadsheets/d/13B823ukxdVMocowo1s5XnT3tzciOfruhUVePENKc01o/htmlview?usp=drive_web)
