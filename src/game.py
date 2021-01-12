@@ -7,7 +7,6 @@ from pygame import mixer
 
 from utils import draw_line, draw_score
 
-
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 900
@@ -20,32 +19,13 @@ global_speed = 1
 game_is_running = True
 
 
-def arg_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "chart_file",
-        help="Path to .CHART file.")
-    return parser.parse_args()
-
-
-def load_imgs():
-    imgs = []
-    
-    for name in ['green', 'red', 'yellow', 'blue', 'orange']:
-        sprite = pygame.image.load(
-                 path.join('..', 'assets', name + 'button.png')).convert_alpha()        
-        imgs.append(sprite)
-        
-    return imgs
-
-
 class Score():
     def __init__(self):
         self.value = 0
         self.x_pos = SCREEN_WIDTH - 100
         self.font_size = 25
-        
-        
+
+
 class Note(pygame.sprite.Sprite):
     def __init__(self, imgs, color):
         super().__init__()
@@ -65,31 +45,50 @@ class Note(pygame.sprite.Sprite):
         self.image = imgs[color]
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
-        
-    def update(self, to_kill=None):        
+
+    def update(self, to_kill=None):
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
-            
+
         global global_speed
         self.rect.y += global_speed
-        
 
-def create_button_list(imgs, all_sprites_list):
+
+def arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "chart_file",
+        help="Path to .CHART file.")
+    return parser.parse_args()
+
+
+def load_imgs():
+    imgs = []
+
+    for name in ['green', 'red', 'yellow', 'blue', 'orange']:
+        sprite = pygame.image.load(
+            path.join('..', 'assets', name + 'button.png')).convert_alpha()
+        imgs.append(sprite)
+
+    return imgs
+
+
+def create_button_list(imgs, buttons_sprites_list):
     buttons = []
-    
+
     for i in range(5):
         button = create_button(imgs[i], color_x_pos[i])
         buttons.append(button)
-        all_sprites_list.add(button)
-        
+        buttons_sprites_list.add(button)
+
     return buttons
-    
+
 
 def create_button(img, x_pos):
     button = pygame.sprite.Sprite()
     button.image = pygame.transform.scale(img, (60, 60))
     button.rect = button.image.get_rect()
-    button.rect.y = SCREEN_HEIGHT-60
+    button.rect.y = SCREEN_HEIGHT-90
     button.rect.x = x_pos
     return button
 
@@ -100,17 +99,17 @@ class Song():
         self.resolution = 192
         self.name = ''
         self.guitar = ''
-        
+
 
 def load_chart(filename, imgs):
 
     f = open(filename, 'r')
     chart_data = f.read().replace('  ', '')
     f.close()
-    
+
     song = load_song_info(chart_data)
     notes = load_notes(chart_data, song, imgs)
-    
+
     return song, notes
 
 
@@ -125,7 +124,7 @@ def load_song_info(chart_data):
     song_data = chart_data[inf:sup]
 
     song = Song()
-    
+
     for line in song_data.splitlines():
         info = line.split()
 
@@ -142,7 +141,7 @@ def load_song_info(chart_data):
             song.guitar = info[2]
 
     return song
-    
+
 
 def load_notes(chart_data, song, imgs):
 
@@ -153,7 +152,7 @@ def load_notes(chart_data, song, imgs):
     inf += len(search_string)
 
     notes_data = chart_data[inf:sup]
-    
+
     notes = []
     stars = []
 
@@ -164,11 +163,11 @@ def load_notes(chart_data, song, imgs):
         # ex: color (n[3] >= 0 e < 5)
         if (n[2] == 'N') and (int(n[3]) < 5):
             note = Note(imgs, int(n[3]))
-            note.start = int(n[0]) - 120 #global_offset
+            note.start = int(n[0]) - 120  # global_offset
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
             # TODO: checar se eh msm 240
-            note.rect.y = (240 * note.start // song.resolution)
+            note.rect.y = -(300 * note.start // song.resolution)
             notes.append(note)
 
         if (n[2] == 'S'):
@@ -190,13 +189,13 @@ def load_notes(chart_data, song, imgs):
                 i -= 1
 
     return notes
-    
+
 
 def handle_inputs():
-    return  
+    return
 
 
-def render(screen, render_interval, score):    
+def render(screen, render_interval, score):
     # Draw Phase
     screen.fill((0, 0, 0))
 
@@ -215,37 +214,40 @@ def render(screen, render_interval, score):
                          (160, SCREEN_HEIGHT-y_offset+128-30-2, 320, 4))
 
     # draw Notes and Buttons
-    all_sprites_list.draw(screen)
-
+    buttons_sprites_list.draw(screen)
+    visible_notes_list.draw(screen)
     # draw score
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
 
     pygame.display.flip()
-    
+
     return
-    
+
 
 # TODO: separar handle input do update
-def update(score):    
+def update(score):
     global game_is_running
+
+    # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
+    visible_notes_list.add(all_notes_list.sprites()[300::-1])
 
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
     orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, all_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
 
     for event in pygame.event.get():
-        
+
         if event.type == pygame.QUIT:
             game_is_running = False
-            
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
                 green_notes_hit_list[0].update(True)
@@ -275,69 +277,70 @@ def update(score):
     # Move notes down
     all_notes_list.update()
 
-    # # If there are no more notes, end the game
+    # If there are no more notes, end the game
     if len(all_notes_list) == 0:
         game_is_running = False
-        
+
 
 if __name__ == "__main__":
 
     args = arg_parser()
 
     pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))   
-    
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
     imgs = load_imgs()
-        
+
     song, notes = load_chart(args.chart_file, imgs)
-    
+
     all_notes_list = pygame.sprite.Group()
-    all_sprites_list = pygame.sprite.Group()
-    
-    greenButton, redButton, yellowButton, blueButton, orangeButton = create_button_list(imgs, all_sprites_list)
-        
+    buttons_sprites_list = pygame.sprite.Group()
+    visible_notes_list = pygame.sprite.Group()
+
+    greenButton, redButton, yellowButton, blueButton, orangeButton = create_button_list(
+        imgs, buttons_sprites_list)
+
     for note in notes:
         all_notes_list.add(note)
-        all_sprites_list.add(note)
-       
-    
+        # buttons_sprites_list.add(note)
+
     # Game Loop
     score = Score()
     game_is_running = True
     clock = pygame.time.Clock()
-    
+
     update_ms = 0
     start_ms = pygame.time.get_ticks()
 
+    print("The Game is Running now!")
     while game_is_running:
         start_time = time.time()
-    
+
         current_ms = pygame.time.get_ticks()
         delta_ms = current_ms - start_ms
         start_ms = current_ms
         update_ms += delta_ms
-    
+
         # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
         #tick_per_ms = song.resolution * current_bpm / MS_PER_MIN
         #ticks += (ticks_per_ms * delta_ms)
-                     
+
         num_updates = 0
-        
+
         while (MS_PER_UPDATE <= update_ms):
-            update(score);
+            update(score)
             update_ms -= MS_PER_UPDATE
             num_updates += 1
-            
-        handle_inputs();       
-        
+
+        handle_inputs()
+
         render_interval = update_ms / MS_PER_UPDATE
-        render(screen, render_interval, score);
-              
+        render(screen, render_interval, score)
+
         clock.tick(60)
-        
-        #print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
-        #print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
-                        
+        # print(clock.get_fps())
+        # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
+        print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
+
+    print("Pontuação Final: {} pontos!".format(score.value))
     pygame.quit()
-        
-    
