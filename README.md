@@ -17,7 +17,7 @@ Tendo esse ambiente, desenvolver um agente de aprendizagem por reforço que apre
 
 
 ## How to run it:
-Após clonar o repositório, entre na pasta do projeto usando um terminal e digite os seguintes comandos:
+After cloning the repository, enter the project folder and type the following commands on the terminal
 ```
 virtualenv venv --python=python3
 
@@ -26,10 +26,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Em seguida entre na pasta src e digite:
+When the installation is done, enter the src folder and on the terminal run:
 ```
-python game.py
+python game.py ../charts/temp3.chart
 ```
+Or any chart of your choice!
 
 ## References:
 - [List of songs to download](https://docs.google.com/spreadsheets/d/13B823ukxdVMocowo1s5XnT3tzciOfruhUVePENKc01o/htmlview?usp=drive_web)
