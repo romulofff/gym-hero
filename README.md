@@ -32,5 +32,10 @@ python game.py ../charts/temp3.chart
 ```
 Or any chart of your choice!
 
-## References:
+## References and helpful links:
 - [List of songs to download](https://docs.google.com/spreadsheets/d/13B823ukxdVMocowo1s5XnT3tzciOfruhUVePENKc01o/htmlview?usp=drive_web)
+- [Parsing Chart Files](https://www.reddit.com/r/CloneHero/comments/9acegu/question_parsing_chart_files_time_signatures_and/)
+- [Forced Notes](https://www.reddit.com/r/CloneHero/comments/bnvu5i/what_are_forced_notes/)
+- [Custom Charts](https://www.reddit.com/r/CloneHero/comments/8bkb0n/a_brief_history_of_custom_guitar_hero_chart/)
+- [Format of Chart files](https://www.reddit.com/r/GuitarHero/comments/5zfyad/question_about_the_format_of_chart_files/)
+- [Understanding Charts](https://www.reddit.com/r/CloneHero/comments/8pf0lj/help_interpreting_the_chart_files/)
