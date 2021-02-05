@@ -97,6 +97,8 @@ class Song():
     def __init__(self):
         self.offset = 0
         self.resolution = 192
+        self.bpm = 120 # Must be read from chart on [SyncTrack]
+        self.divisor = 3
         self.name = ''
         self.guitar = ''
 
@@ -163,11 +165,19 @@ def load_notes(chart_data, song, imgs):
         # ex: color (n[3] >= 0 e < 5)
         if (n[2] == 'N') and (int(n[3]) < 5):
             note = Note(imgs, int(n[3]))
-            note.start = int(n[0]) - 120  # global_offset
+            # note.start = int(n[0]) - 120  # global_offset
+            note.start = int(n[0])  # global_offset
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
+
+            note_beat = (note.start / float(song.resolution)) + song.offset
+            print("NOTE BEAT:", note_beat)
+            pixels_per_beat = (song.bpm/60.0) * 360
+            print("PPB:", pixels_per_beat)
+            note.rect.y = ( - (note_beat * pixels_per_beat)) / song.divisor
+            print("Y:", note.rect.y)
             # TODO: checar se eh msm 240
-            note.rect.y = -(300 * note.start // song.resolution)
+            # note.rect.y = -(300 * note.start // song.resolution)
             notes.append(note)
 
         if (n[2] == 'S'):
@@ -340,7 +350,7 @@ if __name__ == "__main__":
         clock.tick(60)
         # print(clock.get_fps())
         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
-        print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
+        # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
 
     print("Pontuação Final: {} pontos!".format(score.value))
     pygame.quit()
