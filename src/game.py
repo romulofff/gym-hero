@@ -97,10 +97,11 @@ class Song():
     def __init__(self):
         self.offset = 0
         self.resolution = 192
-        self.bpm = 120 # Must be read from chart on [SyncTrack]
+        self.bpm = 120  # Must be read from chart on [SyncTrack]
         self.divisor = 3
         self.name = ''
         self.guitar = ''
+        self.bpm_dict = {}
 
 
 def load_chart(filename, imgs):
@@ -142,7 +143,24 @@ def load_song_info(chart_data):
         if (info[0] == 'GuitarStream'):
             song.guitar = info[2]
 
+    load_resolutions(chart_data, song)
     return song
+
+
+def load_resolutions(chart_data, song):
+    search_string = '[SyncTrack]\n{\n'
+    inf = chart_data.find(search_string)
+    sup = chart_data[inf:].find('}')
+    sup += inf
+    inf += len(search_string)
+
+    resolutions_data = chart_data[inf:sup]
+
+    for line in resolutions_data.splitlines():
+        res = line.split()
+
+        if res[2] == 'B':
+            song.bpm_dict[int(res[0])] = int(res[3])/1000
 
 
 def load_notes(chart_data, song, imgs):
@@ -161,6 +179,8 @@ def load_notes(chart_data, song, imgs):
     for line in notes_data.splitlines():
         n = line.split()
 
+        if int(n[0]) in song.bpm_dict:
+            song.resolution = song.bpm_dict[int(n[0])]
         # TODO: checar todos os intervalos validos
         # ex: color (n[3] >= 0 e < 5)
         if (n[2] == 'N') and (int(n[3]) < 5):
@@ -174,7 +194,7 @@ def load_notes(chart_data, song, imgs):
             print("NOTE BEAT:", note_beat)
             pixels_per_beat = (song.bpm/60.0) * 360
             print("PPB:", pixels_per_beat)
-            note.rect.y = ( - (note_beat * pixels_per_beat)) / song.divisor
+            note.rect.y = (- (note_beat * pixels_per_beat)) / song.divisor
             print("Y:", note.rect.y)
             # TODO: checar se eh msm 240
             # note.rect.y = -(300 * note.start // song.resolution)
