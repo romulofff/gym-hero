@@ -102,6 +102,8 @@ class Song():
         self.name = ''
         self.guitar = ''
         self.bpm_dict = {}
+        self.ts = 4
+        self.ts_dict = {}
 
 
 def load_chart(filename, imgs):
@@ -161,6 +163,9 @@ def load_resolutions(chart_data, song):
 
         if res[2] == 'B':
             song.bpm_dict[int(res[0])] = int(res[3])/1000
+        elif res[2] == 'TS':
+            song.ts_dict[int(res[0])] = int(res[3])
+
 
 
 def load_notes(chart_data, song, imgs):
@@ -176,11 +181,18 @@ def load_notes(chart_data, song, imgs):
     notes = []
     stars = []
 
+    mspb = (song.ts / song.bpm) * 60.0 * 1000.0
+    mspt = mspb / (song.resolution * song.ts)
+
+
     for line in notes_data.splitlines():
         n = line.split()
 
         if int(n[0]) in song.bpm_dict:
-            song.resolution = song.bpm_dict[int(n[0])]
+            song.bpm = song.bpm_dict[int(n[0])]
+        if int(n[0]) in song.ts_dict:
+            song.ts = song.ts_dict[int(n[0])]
+
         # TODO: checar todos os intervalos validos
         # ex: color (n[3] >= 0 e < 5)
         if (n[2] == 'N') and (int(n[3]) < 5):
