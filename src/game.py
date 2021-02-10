@@ -184,11 +184,6 @@ def load_notes(chart_data, song, imgs):
     for line in notes_data.splitlines():
         n = line.split()
 
-        if int(n[0]) in song.bpm_dict:
-            song.bpm = song.bpm_dict[int(n[0])]
-        if int(n[0]) in song.ts_dict:
-            song.ts = song.ts_dict[int(n[0])]
-
         # TODO: checar todos os intervalos validos
         # ex: color (n[3] >= 0 e < 5)
         if (n[2] == 'N') and (int(n[3]) < 5):
@@ -199,12 +194,12 @@ def load_notes(chart_data, song, imgs):
             note.rect.x = color_x_pos[note.color]
 
             note_beat = (note.start / float(song.resolution)) + song.offset
-            print("NOTE BEAT:", note_beat)
+            # print("NOTE BEAT:", note_beat)
             pixels_per_beat = (song.bpm/60.0) * 360
-            print("PPB:", pixels_per_beat)
+            # print("PPB:", pixels_per_beat)
             note.rect.y = (- (note_beat * pixels_per_beat)) / song.divisor
-            print("Y:", note.rect.y)
-            # TODO: checar se eh msm 240
+            # print("Y:", note.rect.y)
+            # TODO: Decide best way to start note's y values
             # note.rect.y = -(300 * note.start // song.resolution)
             notes.append(note)
 
@@ -263,8 +258,14 @@ def render(screen, render_interval, score):
 
 
 # TODO: separar handle input do update
-def update(score):
+def update(score, ticks):
     global game_is_running
+    
+    # Poorly updates song BPM and TS values
+    if ticks in song.bpm_dict and song.bpm_dict[ticks] != song.bpm:
+        song.bpm = song.bpm_dict[ticks]
+    if ticks in song.ts_dict and song.ts_dict[ticks] != song.ts:
+        song.ts = song.ts_dict[ticks]
 
     # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
     visible_notes_list.add(all_notes_list.sprites()[300::-1])
@@ -350,23 +351,25 @@ if __name__ == "__main__":
     update_ms = 0
     start_ms = pygame.time.get_ticks()
 
+    ticks = 0
     print("The Game is Running now!")
     while game_is_running:
         start_time = time.time()
 
         current_ms = pygame.time.get_ticks()
-        delta_ms = current_ms - start_ms
+        # delta_ms = current_ms - start_ms
+        delta_ms = clock.get_time()
         start_ms = current_ms
         update_ms += delta_ms
 
         # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
-        #tick_per_ms = song.resolution * current_bpm / MS_PER_MIN
-        #ticks += (ticks_per_ms * delta_ms)
-
+        tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
+        ticks += (tick_per_ms * delta_ms)
+        # print(int(ticks))
         num_updates = 0
 
         while (MS_PER_UPDATE <= update_ms):
-            update(score)
+            update(score, int(ticks))
             update_ms -= MS_PER_UPDATE
             num_updates += 1
 
@@ -376,6 +379,8 @@ if __name__ == "__main__":
         render(screen, render_interval, score)
 
         clock.tick(60)
+        # print(clock.get_time())
+        # print(clock.get_rawtime())
         # print(clock.get_fps())
         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
