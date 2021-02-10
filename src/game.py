@@ -9,13 +9,13 @@ from utils import draw_line, draw_score
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 900
+SCREEN_HEIGHT = 720
 MS_PER_UPDATE = 5
 MS_PER_MIN = 60000
 
 color_x_pos = [163, 227, 291, 355, 419]
 
-global_speed = 1
+# global_speed = 1
 game_is_running = True
 
 
@@ -50,7 +50,7 @@ class Note(pygame.sprite.Sprite):
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
 
-        global global_speed
+        global_speed = 4
         self.rect.y += global_speed
 
 
@@ -180,11 +180,7 @@ def load_notes(chart_data, song, imgs):
 
     notes = []
     stars = []
-
-    mspb = (song.ts / song.bpm) * 60.0 * 1000.0
-    mspt = mspb / (song.resolution * song.ts)
-
-
+    
     for line in notes_data.splitlines():
         n = line.split()
 
