@@ -10,8 +10,15 @@ from utils import draw_line, draw_score
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 720
-MS_PER_UPDATE = 5
+# TODO: com TICKS_PER_UPDATE = 1 ta quebrando
+TICKS_PER_UPDATE = 5
 MS_PER_MIN = 60000
+
+# TODO: qdo aumenta mto, da errado (ex 500)
+PIXELS_PER_BEAT = 400
+# PIXELS_PER_BEAT -> best offset
+# 200 -> 600
+# 20 -> 850
 
 color_x_pos = [163, 227, 291, 355, 419]
 
@@ -50,7 +57,7 @@ class Note(pygame.sprite.Sprite):
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
 
-        global_speed = 4
+        global_speed = 2
         self.rect.y += global_speed
 
 
@@ -101,9 +108,9 @@ class Song():
         self.divisor = 3
         self.name = ''
         self.guitar = ''
-        self.bpm_dict = {}
+        self.bpm_dict = {} # Should be a matrix
         self.ts = 4
-        self.ts_dict = {}
+        self.ts_dict = {} # Should be a matrix
 
 
 def load_chart(filename, imgs):
@@ -134,13 +141,13 @@ def load_song_info(chart_data):
         info = line.split()
 
         if (info[0] == 'Offset'):
-            song.offset = int(info[2])
+            song.offset = int(info[2]) + 600
 
         if (info[0] == 'Resolution'):
             song.resolution = int(info[2])
 
         if (info[0] == 'MusicStream'):
-            song.name = info[2]
+            song.name = info[2].strip('\"')
 
         if (info[0] == 'GuitarStream'):
             song.guitar = info[2]
@@ -166,7 +173,8 @@ def load_resolutions(chart_data, song):
         elif res[2] == 'TS':
             song.ts_dict[int(res[0])] = int(res[3])
 
-
+    song.bpm = song.bpm_dict[0]
+    song.ts = song.ts_dict[0]
 
 def load_notes(chart_data, song, imgs):
 
@@ -193,14 +201,17 @@ def load_notes(chart_data, song, imgs):
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
 
-            note_beat = (note.start / float(song.resolution)) + song.offset
-            # print("NOTE BEAT:", note_beat)
-            pixels_per_beat = (song.bpm/60.0) * 360
-            # print("PPB:", pixels_per_beat)
-            note.rect.y = (- (note_beat * pixels_per_beat)) / song.divisor
-            # print("Y:", note.rect.y)
+            #note_beat = (note.start / float(song.resolution))# + song.offset
+            # TODO: lembrar de levar em consideração o offset
+            #print("NOTE BEAT:", note_beat)
+            #pixels_per_beat = (song.bpm / 60.0) * 360
+            #print("PPB:", pixels_per_beat)
+            #note.y_pos = (- (note_beat * pixels_per_beat)) / song.divisor
+            #print("Y:", note.y_pos)
             # TODO: Decide best way to start note's y values
-            # note.rect.y = -(300 * note.start // song.resolution)
+            #note.y_pos = -(300 * note.start // song.resolution)
+            note.y_pos = -(PIXELS_PER_BEAT * (note.start + song.offset) / song.resolution)
+            #print("y: ", note.y_pos)
             notes.append(note)
 
         if (n[2] == 'S'):
