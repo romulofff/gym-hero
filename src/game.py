@@ -178,6 +178,7 @@ def load_resolutions(chart_data, song):
     song.bpm = song.bpm_dict[0]
     song.ts = song.ts_dict[0]
 
+
 def load_notes(chart_data, song, imgs):
 
     search_string = '[ExpertSingle]\n{\n'
@@ -200,6 +201,7 @@ def load_notes(chart_data, song, imgs):
             note = Note(imgs, int(n[3]))
             # note.start = int(n[0]) - 120  # global_offset
             note.start = int(n[0])  # global_offset
+            #print(note.start)
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
 
@@ -285,15 +287,15 @@ def update(score, ticks):
 
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
 
     for event in pygame.event.get():
 
@@ -327,7 +329,7 @@ def update(score, ticks):
                 score.value += 10
 
     # Move notes down
-    all_notes_list.update()
+    all_notes_list.update(ticks)
 
     # If there are no more notes, end the game
     if len(all_notes_list) == 0:
@@ -362,13 +364,13 @@ if __name__ == "__main__":
     clock = pygame.time.Clock()
 
     update_ticks = 0
-    start_ms = pygame.time.get_ticks()
 
+    
     ticks = 0
     start_ms = pygame.time.get_ticks()
-
+    
     print("The Game is Running now!")
-
+    
     while game_is_running:
         start_time = time.time()
 
@@ -377,14 +379,14 @@ if __name__ == "__main__":
         #delta_ms = clock.get_time()
         start_ms = current_ms
 
-       # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+        # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
         #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
         tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
         delta_ticks = tick_per_ms * delta_ms
         update_ticks += delta_ticks
-
+        
         num_updates = 0
-
+        
         while (TICKS_PER_UPDATE <= update_ticks):
             print('--------UPDATE-------')
             print(ticks)
@@ -397,7 +399,7 @@ if __name__ == "__main__":
 
         render_interval = update_ticks / TICKS_PER_UPDATE
         render(screen, render_interval, score)
-
+        
         clock.tick(60)
         # print(clock.get_time())
         # print(clock.get_rawtime())
