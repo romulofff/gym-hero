@@ -41,6 +41,8 @@ class Note(pygame.sprite.Sprite):
         self.color = color
         self.duration = 0
         self.__set_image(imgs, self.color)
+        self.last_ticks = 0
+        self.y_pos = 0
 
     def __repr__(self):
         return f'<Note start:{self.start} type:{self.type} color:{self.color} duration:{self.duration}>'
@@ -54,11 +56,11 @@ class Note(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self, to_kill=None):
+        self.rect.y = int(self.y_pos) + (SCREEN_HEIGHT-90)
+        self.y_pos += (TICKS_PER_UPDATE * PIXELS_PER_BEAT / song.resolution)
+        
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
-
-        global_speed = 2
-        self.rect.y += global_speed
 
 
 def arg_parser():
