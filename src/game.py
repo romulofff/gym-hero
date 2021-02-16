@@ -283,15 +283,15 @@ def update(score, ticks):
 
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
 
     for event in pygame.event.get():
 
@@ -410,4 +410,8 @@ if __name__ == "__main__":
         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
 
     print("Pontuação Final: {} pontos!".format(score.value))
+    
+    song_audio.stop()
+    mixer.quit()
+
     pygame.quit()
