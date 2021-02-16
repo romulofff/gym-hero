@@ -251,11 +251,11 @@ def render(screen, render_interval, score):
     pygame.draw.rect(screen, (200, 200, 200), (480, 0, 20, SCREEN_HEIGHT))
 
     for i in range(500):
-        y_offset = (i * 256)
+        y_offset = (i * PIXELS_PER_BEAT)
         pygame.draw.rect(screen, (180, 180, 180),
-                         (160, SCREEN_HEIGHT-y_offset-30-2, 320, 4))
+                         (160, SCREEN_HEIGHT-y_offset-60-2, 320, 4))
         pygame.draw.rect(screen, (100, 100, 100),
-                         (160, SCREEN_HEIGHT-y_offset+128-30-2, 320, 4))
+                         (160, SCREEN_HEIGHT-y_offset+128-60-2, 320, 4))
 
     # draw Notes and Buttons
     buttons_sprites_list.draw(screen)
@@ -273,9 +273,9 @@ def update(score, ticks):
     global game_is_running
     
     # Poorly updates song BPM and TS values
-    if ticks in song.bpm_dict and song.bpm_dict[ticks] != song.bpm:
+    if ticks in song.bpm_dict:
         song.bpm = song.bpm_dict[ticks]
-    if ticks in song.ts_dict and song.ts_dict[ticks] != song.ts:
+    if ticks in song.ts_dict:
         song.ts = song.ts_dict[ticks]
 
     # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
@@ -359,34 +359,41 @@ if __name__ == "__main__":
     game_is_running = True
     clock = pygame.time.Clock()
 
-    update_ms = 0
+    update_ticks = 0
     start_ms = pygame.time.get_ticks()
 
     ticks = 0
+    start_ms = pygame.time.get_ticks()
+
     print("The Game is Running now!")
+
     while game_is_running:
         start_time = time.time()
 
         current_ms = pygame.time.get_ticks()
-        # delta_ms = current_ms - start_ms
-        delta_ms = clock.get_time()
+        delta_ms = current_ms - start_ms
+        #delta_ms = clock.get_time()
         start_ms = current_ms
-        update_ms += delta_ms
 
-        # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+       # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+        #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
         tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
-        ticks += (tick_per_ms * delta_ms)
-        # print(int(ticks))
+        delta_ticks = tick_per_ms * delta_ms
+        update_ticks += delta_ticks
+
         num_updates = 0
 
-        while (MS_PER_UPDATE <= update_ms):
-            update(score, int(ticks))
-            update_ms -= MS_PER_UPDATE
+        while (TICKS_PER_UPDATE <= update_ticks):
+            print('--------UPDATE-------')
+            print(ticks)
+            update(score, ticks)
+            update_ticks -= TICKS_PER_UPDATE
             num_updates += 1
+            ticks += TICKS_PER_UPDATE
 
         handle_inputs()
 
-        render_interval = update_ms / MS_PER_UPDATE
+        render_interval = update_ticks / TICKS_PER_UPDATE
         render(screen, render_interval, score)
 
         clock.tick(60)
