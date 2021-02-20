@@ -303,67 +303,45 @@ def update(score, ticks):
     visible_notes_list.add(all_notes_list.sprites()[50::-1])
 
     # Check for collisions
-    green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
+    Buttons_hit_list_by_color = [
+        pygame.sprite.spritecollide(
+            button_type,
+            visible_notes_list,
+            False,
+            pygame.sprite.collide_circle_ratio(0.6)
+        ) for button_type in Buttons]
 
     # Unoptimized unpressed notes detection:
-    playable_notes = green_notes_hit_list + red_notes_hit_list + yellow_notes_hit_list + blue_notes_hit_list + orange_notes_hit_list
-    for note in playable_notes:
+    Buttons_hit_list = []
+    for button_color in Buttons_hit_list_by_color:
+        Buttons_hit_list += button_color
+
+    for note in Buttons_hit_list:
         if not note in recent_note_history:
             recent_note_history.append(note)
 
     for note in recent_note_history:
-        if not note in playable_notes:
+        if not note in Buttons_hit_list:
             score.reset()
             recent_note_history.remove(note)
+    # Finished unoptimized unpressed notes detection:
 
+    keys = 'asdfg' #could be a list, tuple or dict instead
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             game_is_running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
-                    green_notes_hit_list[0].update(True)
-                    recent_note_history.remove(green_notes_hit_list[0])
-                    # print('Pressed Green')
-                    score.add()
-
-            elif event.key == pygame.K_s and len(red_notes_hit_list) > 0:
-                    red_notes_hit_list[0].update(True)
-                    recent_note_history.remove(red_notes_hit_list[0])
-                    # print('Pressed Red')
-                    score.add()
-
-            elif event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
-                    yellow_notes_hit_list[0].update(True)
-                    recent_note_history.remove(yellow_notes_hit_list[0])
-                    # print('Pressed Yellow')
-                    score.add()
-
-            elif event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
-                    blue_notes_hit_list[0].update(True)
-                    recent_note_history.remove(blue_notes_hit_list[0])
-                    # print('Pressed Blue')
-                    score.add()
-
-            elif event.key == pygame.K_g and len(orange_notes_hit_list) > 0:
-                    orange_notes_hit_list[0].update(True)
-                    recent_note_history.remove(orange_notes_hit_list[0])
-                    # print('Pressed Orange')
-                    score.add()
-
-            # if a key is pressed, but no note is to be played: reset multiplier
-            elif event.key in (pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_f, pygame.K_g):
-                score.reset()
+            for n, button_hit in enumerate(Buttons_hit_list_by_color):
+                if event.key == getattr(pygame, f"K_{keys[n]}"):
+                    if len(button_hit) > 0:
+                        button_hit[0].update(True)
+                        recent_note_history.remove(button_hit[0])
+                        score.add()
+                    else:
+                        #key was pressed but without any note
+                        score.reset()
 
     # Move notes down
     all_notes_list.update(ticks)
@@ -388,7 +366,7 @@ if __name__ == "__main__":
     buttons_sprites_list = pygame.sprite.Group()
     visible_notes_list = pygame.sprite.Group()
 
-    greenButton, redButton, yellowButton, blueButton, orangeButton = create_button_list(
+    Buttons = create_button_list(
         imgs, buttons_sprites_list)
 
     for note in notes:
