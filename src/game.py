@@ -9,13 +9,20 @@ from utils import draw_line, draw_score
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 900
-MS_PER_UPDATE = 5
+SCREEN_HEIGHT = 720
+# TODO: com TICKS_PER_UPDATE = 1 ta quebrando
+TICKS_PER_UPDATE = 5
 MS_PER_MIN = 60000
+
+# TODO: qdo aumenta mto, da errado (ex 500)
+PIXELS_PER_BEAT = 400
+# PIXELS_PER_BEAT -> best offset
+# 200 -> 600
+# 20 -> 850
 
 color_x_pos = [163, 227, 291, 355, 419]
 
-global_speed = 1
+# global_speed = 1
 game_is_running = True
 
 
@@ -50,7 +57,7 @@ class Note(pygame.sprite.Sprite):
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
 
-        global global_speed
+        global_speed = 2
         self.rect.y += global_speed
 
 
@@ -97,8 +104,13 @@ class Song():
     def __init__(self):
         self.offset = 0
         self.resolution = 192
+        self.bpm = 120  # Must be read from chart on [SyncTrack]
+        self.divisor = 3
         self.name = ''
         self.guitar = ''
+        self.bpm_dict = {}  # Should be a matrix
+        self.ts = 4
+        self.ts_dict = {}  # Should be a matrix
 
 
 def load_chart(filename, imgs):
@@ -129,18 +141,40 @@ def load_song_info(chart_data):
         info = line.split()
 
         if (info[0] == 'Offset'):
-            song.offset = int(info[2])
+            song.offset = int(info[2]) + 600
 
         if (info[0] == 'Resolution'):
             song.resolution = int(info[2])
 
         if (info[0] == 'MusicStream'):
-            song.name = info[2]
+            song.name = info[2].strip('\"')
 
         if (info[0] == 'GuitarStream'):
             song.guitar = info[2]
 
+    load_resolutions(chart_data, song)
     return song
+
+
+def load_resolutions(chart_data, song):
+    search_string = '[SyncTrack]\n{\n'
+    inf = chart_data.find(search_string)
+    sup = chart_data[inf:].find('}')
+    sup += inf
+    inf += len(search_string)
+
+    resolutions_data = chart_data[inf:sup]
+
+    for line in resolutions_data.splitlines():
+        res = line.split()
+
+        if res[2] == 'B':
+            song.bpm_dict[int(res[0])] = int(res[3])/1000
+        elif res[2] == 'TS':
+            song.ts_dict[int(res[0])] = int(res[3])
+
+    song.bpm = song.bpm_dict[0]
+    song.ts = song.ts_dict[0]
 
 
 def load_notes(chart_data, song, imgs):
@@ -163,11 +197,24 @@ def load_notes(chart_data, song, imgs):
         # ex: color (n[3] >= 0 e < 5)
         if (n[2] == 'N') and (int(n[3]) < 5):
             note = Note(imgs, int(n[3]))
-            note.start = int(n[0]) - 120  # global_offset
+            # note.start = int(n[0]) - 120  # global_offset
+            note.start = int(n[0])  # global_offset
+            # print(note.start)
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
-            # TODO: checar se eh msm 240
-            note.rect.y = -(300 * note.start // song.resolution)
+
+            # note_beat = (note.start / float(song.resolution))# + song.offset
+            # TODO: lembrar de levar em consideração o offset
+            #print("NOTE BEAT:", note_beat)
+            #pixels_per_beat = (song.bpm / 60.0) * 360
+            #print("PPB:", pixels_per_beat)
+            #note.y_pos = (- (note_beat * pixels_per_beat)) / song.divisor
+            #print("Y:", note.y_pos)
+            # TODO: Decide best way to start note's y values
+            #note.y_pos = -(300 * note.start // song.resolution)
+            note.y_pos = -(PIXELS_PER_BEAT * (note.start +
+                                              song.offset) / song.resolution)
+            #print("y: ", note.y_pos)
             notes.append(note)
 
         if (n[2] == 'S'):
@@ -207,11 +254,11 @@ def render(screen, render_interval, score):
     pygame.draw.rect(screen, (200, 200, 200), (480, 0, 20, SCREEN_HEIGHT))
 
     for i in range(500):
-        y_offset = (i * 256)
+        y_offset = (i * PIXELS_PER_BEAT)
         pygame.draw.rect(screen, (180, 180, 180),
-                         (160, SCREEN_HEIGHT-y_offset-30-2, 320, 4))
+                         (160, SCREEN_HEIGHT-y_offset-60-2, 320, 4))
         pygame.draw.rect(screen, (100, 100, 100),
-                         (160, SCREEN_HEIGHT-y_offset+128-30-2, 320, 4))
+                         (160, SCREEN_HEIGHT-y_offset+128-60-2, 320, 4))
 
     # draw Notes and Buttons
     buttons_sprites_list.draw(screen)
@@ -225,23 +272,29 @@ def render(screen, render_interval, score):
 
 
 # TODO: separar handle input do update
-def update(score):
+def update(score, ticks):
     global game_is_running
+
+    # Poorly updates song BPM and TS values
+    if ticks in song.bpm_dict:
+        song.bpm = song.bpm_dict[ticks]
+    if ticks in song.ts_dict:
+        song.ts = song.ts_dict[ticks]
 
     # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
     visible_notes_list.add(all_notes_list.sprites()[300::-1])
 
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
     orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.5))
+        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
 
     for event in pygame.event.get():
 
@@ -309,38 +362,58 @@ if __name__ == "__main__":
     game_is_running = True
     clock = pygame.time.Clock()
 
-    update_ms = 0
+    mixer.init()
+    audio_name = '../charts/' + song.name
+    print("You are playing {}.".format(audio_name))
+    song_audio = mixer.Sound(audio_name)
+    song_audio.set_volume(0.3)
+    song_audio.play()
+
+    ticks = 0
+    update_ticks = 0
     start_ms = pygame.time.get_ticks()
 
     print("The Game is Running now!")
+
     while game_is_running:
         start_time = time.time()
 
         current_ms = pygame.time.get_ticks()
         delta_ms = current_ms - start_ms
+        #delta_ms = clock.get_time()
         start_ms = current_ms
-        update_ms += delta_ms
 
-        # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
-        #tick_per_ms = song.resolution * current_bpm / MS_PER_MIN
-        #ticks += (ticks_per_ms * delta_ms)
+       # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+        #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
+        tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
+        delta_ticks = tick_per_ms * delta_ms
+        update_ticks += delta_ticks
 
         num_updates = 0
 
-        while (MS_PER_UPDATE <= update_ms):
-            update(score)
-            update_ms -= MS_PER_UPDATE
+        while (TICKS_PER_UPDATE <= update_ticks):
+            print('--------UPDATE-------')
+            print(ticks)
+            update(score, ticks)
+            update_ticks -= TICKS_PER_UPDATE
             num_updates += 1
+            ticks += TICKS_PER_UPDATE
 
         handle_inputs()
 
-        render_interval = update_ms / MS_PER_UPDATE
+        render_interval = update_ticks / TICKS_PER_UPDATE
         render(screen, render_interval, score)
 
         clock.tick(60)
+        # print(clock.get_time())
+        # print(clock.get_rawtime())
         # print(clock.get_fps())
         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
-        print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
+        # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
 
     print("Pontuação Final: {} pontos!".format(score.value))
+
+    song_audio.stop()
+    mixer.quit()
+
     pygame.quit()
