@@ -41,6 +41,8 @@ class Note(pygame.sprite.Sprite):
         self.color = color
         self.duration = 0
         self.__set_image(imgs, self.color)
+        self.last_ticks = 0
+        self.y_pos = 0
 
     def __repr__(self):
         return f'<Note start:{self.start} type:{self.type} color:{self.color} duration:{self.duration}>'
@@ -54,11 +56,11 @@ class Note(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def update(self, to_kill=None):
+        self.rect.y = int(self.y_pos) + (SCREEN_HEIGHT-90)
+        self.y_pos += (TICKS_PER_UPDATE * PIXELS_PER_BEAT / song.resolution)
+        
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
-
-        global_speed = 2
-        self.rect.y += global_speed
 
 
 def arg_parser():
@@ -199,7 +201,9 @@ def load_notes(chart_data, song, imgs):
             note = Note(imgs, int(n[3]))
             # note.start = int(n[0]) - 120  # global_offset
             note.start = int(n[0])  # global_offset
+
             # print(note.start)
+
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
 
@@ -328,7 +332,7 @@ def update(score, ticks):
                 score.value += 10
 
     # Move notes down
-    all_notes_list.update()
+    all_notes_list.update(ticks)
 
     # If there are no more notes, end the game
     if len(all_notes_list) == 0:
@@ -362,6 +366,7 @@ if __name__ == "__main__":
     game_is_running = True
     clock = pygame.time.Clock()
 
+
     mixer.init()
     audio_name = '../charts/' + song.name
     print("You are playing {}.".format(audio_name))
@@ -369,12 +374,14 @@ if __name__ == "__main__":
     song_audio.set_volume(0.3)
     song_audio.play()
 
+
+    
     ticks = 0
     update_ticks = 0
     start_ms = pygame.time.get_ticks()
-
+    
     print("The Game is Running now!")
-
+    
     while game_is_running:
         start_time = time.time()
 
@@ -383,14 +390,14 @@ if __name__ == "__main__":
         #delta_ms = clock.get_time()
         start_ms = current_ms
 
-       # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+        # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
         #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
         tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
         delta_ticks = tick_per_ms * delta_ms
         update_ticks += delta_ticks
-
+        
         num_updates = 0
-
+        
         while (TICKS_PER_UPDATE <= update_ticks):
             print('--------UPDATE-------')
             print(ticks)
@@ -403,7 +410,7 @@ if __name__ == "__main__":
 
         render_interval = update_ticks / TICKS_PER_UPDATE
         render(screen, render_interval, score)
-
+        
         clock.tick(60)
         # print(clock.get_time())
         # print(clock.get_rawtime())
