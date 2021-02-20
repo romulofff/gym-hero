@@ -32,6 +32,15 @@ class Score():
         self.x_pos = SCREEN_WIDTH - 100
         self.font_size = 25
 
+        self._counter = 1
+
+    def add(self):
+        self._counter = min(self._counter + 1, 40)
+        self.value += 10 * self._counter // 10
+
+    def reset(self):
+        self._counter = 1
+
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, imgs, color):
@@ -302,30 +311,45 @@ def update(score, ticks):
             game_is_running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
-                green_notes_hit_list[0].update(True)
-                # print('Pressed Green')
-                score.value += 10
+            if event.key == pygame.K_a:
+                if len(green_notes_hit_list) > 0:
+                    green_notes_hit_list[0].update(True)
+                    # print('Pressed Green')
+                    score.add()
+                else:
+                    score.reset()
 
-            if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
-                red_notes_hit_list[0].update(True)
-                # print('Pressed Red')
-                score.value += 10
+            if event.key == pygame.K_s:
+                if len(red_notes_hit_list) > 0:
+                    red_notes_hit_list[0].update(True)
+                    # print('Pressed Red')
+                    score.add()
+                else:
+                    score.reset()
 
-            if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
-                yellow_notes_hit_list[0].update(True)
-                # print('Pressed Yellow')
-                score.value += 10
+            if event.key == pygame.K_d:
+                if len(yellow_notes_hit_list) > 0:
+                    yellow_notes_hit_list[0].update(True)
+                    # print('Pressed Yellow')
+                    score.add()
+                else:
+                    score.reset()
 
-            if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
-                blue_notes_hit_list[0].update(True)
-                # print('Pressed Blue')
-                score.value += 10
+            if event.key == pygame.K_f:
+                if len(blue_notes_hit_list) > 0:
+                    blue_notes_hit_list[0].update(True)
+                    # print('Pressed Blue')
+                    score.add()
+                else:
+                    score.reset()
 
-            if event.key == pygame.K_g and len(orange_notes_hit_list) > 0:
-                orange_notes_hit_list[0].update(True)
-                # print('Pressed Orange')
-                score.value += 10
+            if event.key == pygame.K_g:
+                if len(orange_notes_hit_list) > 0:
+                    orange_notes_hit_list[0].update(True)
+                    # print('Pressed Orange')
+                    score.add()
+                else:
+                    score.reset()
 
     # Move notes down
     all_notes_list.update()
@@ -362,12 +386,12 @@ if __name__ == "__main__":
     game_is_running = True
     clock = pygame.time.Clock()
 
-    mixer.init()
-    audio_name = '../charts/' + song.name
-    print("You are playing {}.".format(audio_name))
-    song_audio = mixer.Sound(audio_name)
-    song_audio.set_volume(0.3)
-    song_audio.play()
+    # mixer.init()
+    # audio_name = '../charts/' + song.name
+    # print("You are playing {}.".format(audio_name))
+    # song_audio = mixer.Sound(audio_name)
+    # song_audio.set_volume(0.3)
+    # song_audio.play()
 
     ticks = 0
     update_ticks = 0
@@ -413,7 +437,7 @@ if __name__ == "__main__":
 
     print("Pontuação Final: {} pontos!".format(score.value))
 
-    song_audio.stop()
-    mixer.quit()
+    # song_audio.stop()
+    # mixer.quit()
 
     pygame.quit()
