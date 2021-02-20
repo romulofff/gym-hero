@@ -110,9 +110,9 @@ class Song():
         self.divisor = 3
         self.name = ''
         self.guitar = ''
-        self.bpm_dict = {} # Should be a matrix
+        self.bpm_dict = {}  # Should be a matrix
         self.ts = 4
-        self.ts_dict = {} # Should be a matrix
+        self.ts_dict = {}  # Should be a matrix
 
 
 def load_chart(filename, imgs):
@@ -191,7 +191,7 @@ def load_notes(chart_data, song, imgs):
 
     notes = []
     stars = []
-    
+
     for line in notes_data.splitlines():
         n = line.split()
 
@@ -201,11 +201,13 @@ def load_notes(chart_data, song, imgs):
             note = Note(imgs, int(n[3]))
             # note.start = int(n[0]) - 120  # global_offset
             note.start = int(n[0])  # global_offset
-            #print(note.start)
+
+            # print(note.start)
+
             note.duration = int(n[4])
             note.rect.x = color_x_pos[note.color]
 
-            #note_beat = (note.start / float(song.resolution))# + song.offset
+            # note_beat = (note.start / float(song.resolution))# + song.offset
             # TODO: lembrar de levar em consideração o offset
             #print("NOTE BEAT:", note_beat)
             #pixels_per_beat = (song.bpm / 60.0) * 360
@@ -214,7 +216,8 @@ def load_notes(chart_data, song, imgs):
             #print("Y:", note.y_pos)
             # TODO: Decide best way to start note's y values
             #note.y_pos = -(300 * note.start // song.resolution)
-            note.y_pos = -(PIXELS_PER_BEAT * (note.start + song.offset) / song.resolution)
+            note.y_pos = -(PIXELS_PER_BEAT * (note.start +
+                                              song.offset) / song.resolution)
             #print("y: ", note.y_pos)
             notes.append(note)
 
@@ -275,7 +278,7 @@ def render(screen, render_interval, score):
 # TODO: separar handle input do update
 def update(score, ticks):
     global game_is_running
-    
+
     # Poorly updates song BPM and TS values
     if ticks in song.bpm_dict:
         song.bpm = song.bpm_dict[ticks]
@@ -363,10 +366,18 @@ if __name__ == "__main__":
     game_is_running = True
     clock = pygame.time.Clock()
 
-    update_ticks = 0
+
+    mixer.init()
+    audio_name = '../charts/' + song.name
+    print("You are playing {}.".format(audio_name))
+    song_audio = mixer.Sound(audio_name)
+    song_audio.set_volume(0.3)
+    song_audio.play()
+
 
     
     ticks = 0
+    update_ticks = 0
     start_ms = pygame.time.get_ticks()
     
     print("The Game is Running now!")
@@ -408,4 +419,8 @@ if __name__ == "__main__":
         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
 
     print("Pontuação Final: {} pontos!".format(score.value))
+
+    song_audio.stop()
+    mixer.quit()
+
     pygame.quit()
