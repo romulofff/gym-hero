@@ -193,9 +193,9 @@ def load_resolutions(chart_data, song):
     song.ts = song.ts_dict[0]
 
 
-def load_notes(chart_data, song, imgs):
+def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 
-    search_string = '[ExpertSingle]\n{\n'
+    search_string = "[" + difficulty + "]\n{\n"
     inf = chart_data.find(search_string)
     sup = chart_data[inf:].find('}')
     sup += inf
@@ -333,15 +333,19 @@ def update(score, ticks):
             game_is_running = False
 
         if event.type == pygame.KEYDOWN:
-            for n, button_hit in enumerate(Buttons_hit_list_by_color):
-                if event.key == getattr(pygame, f"K_{keys[n]}"):
-                    if len(button_hit) > 0:
-                        button_hit[0].update(True)
-                        recent_note_history.remove(button_hit[0])
+            for n, button_in_hit_zone in enumerate(Buttons_hit_list_by_color):
+                if event.key == getattr(pygame, f"K_{keys[n]}"): #Eg: event.key == pygame.K_a
+                    if len(button_in_hit_zone) > 0:
+                        button_in_hit_zone[0].update(True)
+                        recent_note_history.remove(button_in_hit_zone[0])
                         score.add()
                     else:
                         #key was pressed but without any note
                         score.reset()
+
+                    break
+                    # exits the inner for
+                    # So, those ifs work as if-elif even inside the for loop
 
     # Move notes down
     all_notes_list.update(ticks)
