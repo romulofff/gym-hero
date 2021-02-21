@@ -32,6 +32,20 @@ class Score():
         self.x_pos = SCREEN_WIDTH - 100
         self.font_size = 25
 
+        self._counter = 0
+
+    def add(self):
+        self._counter = min(self._counter + 1, 39)
+        self.value += 10 * (1 + self._counter // 10)
+
+    def reset(self):
+        self._counter = 0
+
+    @property
+    def counter(self):
+        return self._counter + 1
+    
+
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, imgs, color):
@@ -179,9 +193,9 @@ def load_resolutions(chart_data, song):
     song.ts = song.ts_dict[0]
 
 
-def load_notes(chart_data, song, imgs):
+def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 
-    search_string = '[ExpertSingle]\n{\n'
+    search_string = "[" + difficulty + "]\n{\n"
     inf = chart_data.find(search_string)
     sup = chart_data[inf:].find('}')
     sup += inf
@@ -274,10 +288,10 @@ def render(screen, render_interval, score):
 
     return
 
-
+recent_note_history = []
 # TODO: separar handle input do update
 def update(score, ticks):
-    global game_is_running
+    global game_is_running, recent_note_history
 
     # Poorly updates song BPM and TS values
     if ticks in song.bpm_dict:
@@ -286,50 +300,52 @@ def update(score, ticks):
         song.ts = song.ts_dict[ticks]
 
     # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
-    visible_notes_list.add(all_notes_list.sprites()[300::-1])
+    visible_notes_list.add(all_notes_list.sprites()[50::-1])
 
     # Check for collisions
-    green_notes_hit_list = pygame.sprite.spritecollide(
-        greenButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    red_notes_hit_list = pygame.sprite.spritecollide(
-        redButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    yellow_notes_hit_list = pygame.sprite.spritecollide(
-        yellowButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    blue_notes_hit_list = pygame.sprite.spritecollide(
-        blueButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
-    orange_notes_hit_list = pygame.sprite.spritecollide(
-        orangeButton, visible_notes_list, False, pygame.sprite.collide_circle_ratio(0.6))
+    Buttons_hit_list_by_color = [
+        pygame.sprite.spritecollide(
+            button_type,
+            visible_notes_list,
+            False,
+            pygame.sprite.collide_circle_ratio(0.6)
+        ) for button_type in Buttons]
 
+    # Unoptimized unpressed notes detection:
+    Buttons_hit_list = []
+    for button_color in Buttons_hit_list_by_color:
+        Buttons_hit_list += button_color
+
+    for note in Buttons_hit_list:
+        if not note in recent_note_history:
+            recent_note_history.append(note)
+
+    for note in recent_note_history:
+        if not note in Buttons_hit_list:
+            score.reset()
+            recent_note_history.remove(note)
+    # Finished unoptimized unpressed notes detection:
+
+    keys = 'asdfg' #could be a list, tuple or dict instead
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             game_is_running = False
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a and len(green_notes_hit_list) > 0:
-                green_notes_hit_list[0].update(True)
-                # print('Pressed Green')
-                score.value += 10
+            for n, button_in_hit_zone in enumerate(Buttons_hit_list_by_color):
+                if event.key == getattr(pygame, f"K_{keys[n]}"): #Eg: event.key == pygame.K_a
+                    if len(button_in_hit_zone) > 0:
+                        button_in_hit_zone[0].update(True)
+                        recent_note_history.remove(button_in_hit_zone[0])
+                        score.add()
+                    else:
+                        #key was pressed but without any note
+                        score.reset()
 
-            if event.key == pygame.K_s and len(red_notes_hit_list) > 0:
-                red_notes_hit_list[0].update(True)
-                # print('Pressed Red')
-                score.value += 10
-
-            if event.key == pygame.K_d and len(yellow_notes_hit_list) > 0:
-                yellow_notes_hit_list[0].update(True)
-                # print('Pressed Yellow')
-                score.value += 10
-
-            if event.key == pygame.K_f and len(blue_notes_hit_list) > 0:
-                blue_notes_hit_list[0].update(True)
-                # print('Pressed Blue')
-                score.value += 10
-
-            if event.key == pygame.K_g and len(orange_notes_hit_list) > 0:
-                orange_notes_hit_list[0].update(True)
-                # print('Pressed Orange')
-                score.value += 10
+                    break
+                    # exits the inner for
+                    # So, those ifs work as if-elif even inside the for loop
 
     # Move notes down
     all_notes_list.update(ticks)
@@ -354,7 +370,7 @@ if __name__ == "__main__":
     buttons_sprites_list = pygame.sprite.Group()
     visible_notes_list = pygame.sprite.Group()
 
-    greenButton, redButton, yellowButton, blueButton, orangeButton = create_button_list(
+    Buttons = create_button_list(
         imgs, buttons_sprites_list)
 
     for note in notes:
@@ -373,7 +389,6 @@ if __name__ == "__main__":
     song_audio = mixer.Sound(audio_name)
     song_audio.set_volume(0.3)
     song_audio.play()
-
 
     
     ticks = 0
