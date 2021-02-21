@@ -50,6 +50,20 @@ class Score():
         return self._counter + 1
     
 
+        self._counter = 0
+
+    def add(self):
+        self._counter = min(self._counter + 1, 39)
+        self.value += 10 * (1 + self._counter // 10)
+
+    def reset(self):
+        self._counter = 0
+
+    @property
+    def counter(self):
+        return self._counter + 1
+    
+
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, imgs, color):
@@ -327,7 +341,9 @@ def update(score, ticks):
 
     for note in recent_note_history:
         if not note in Buttons_hit_list:
+
             score.miss()
+
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
@@ -343,6 +359,7 @@ def update(score, ticks):
                     if len(button_in_hit_zone) > 0:
                         button_in_hit_zone[0].update(True)
                         recent_note_history.remove(button_in_hit_zone[0])
+
                         score.hit()
                     else:
                         #key was pressed but without any note
@@ -393,6 +410,7 @@ if __name__ == "__main__":
     song_audio = mixer.Sound(audio_name)
     song_audio.set_volume(0.3)
     song_audio.play()
+
     
     ticks = 0
     update_ticks = 0
