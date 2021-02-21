@@ -384,12 +384,21 @@ if __name__ == "__main__":
     game_is_running = True
     clock = pygame.time.Clock()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8afbb8ea857c953ff9efa1aed22ed8fe3de47a27
     mixer.init()
     audio_name = '../charts/' + song.name
     print("You are playing {}.".format(audio_name))
     song_audio = mixer.Sound(audio_name)
     song_audio.set_volume(0.3)
     song_audio.play()
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 8afbb8ea857c953ff9efa1aed22ed8fe3de47a27
     
     ticks = 0
     update_ticks = 0
