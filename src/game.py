@@ -34,12 +34,20 @@ class Score():
         self.decrease_mode = decrease_mode
         self._counter = 0
 
+        self.rock_meter = 50
+
     def hit(self):
         self._counter = min(self._counter + 1, 39)
         self.value += 10 * (1 + self._counter // 10)
 
+        self.rock_meter = min(self.rock_meter + 2, 100)
+
     def miss(self):
         self._counter = 0
+
+        self.rock_meter -= 2
+        if self.rock_meter <= 0:
+            raise NotImplementedError("Game lost, rock meater -> 0")
 
     def miss_click(self):
         self.miss()
@@ -49,6 +57,41 @@ class Score():
     def counter(self):
         return self._counter + 1
     
+def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
+        height = 10
+        width = 20
+
+        #draws the first layer of the meeter,
+        #which consists of the 3 colors, but darkened
+        for i in range(3):
+            pygame.draw.rect(
+                surface,
+                (200 * (i < 2), 180 * (i > 0), 0),
+                (x_pos + i*width, y_pos, width, height)
+            )
+
+        #highlits the color the meeter is in, as if it light up
+        lightned_bar = int((score.rock_meter-1) * (3 / 100))
+        pygame.draw.rect(
+                surface,
+                (255 * (lightned_bar < 2), 255 * (lightned_bar > 0), 0),
+                (x_pos + lightned_bar*width, y_pos, width, height)
+            )
+
+        #locating the position on which the bar will be:
+        total_size = width * 3
+        place = x_pos + (score.rock_meter / 100) * total_size
+
+        #drawing the bar on top of meeter
+        pygame.draw.line(
+            surface,
+            color=(255, 255, 255),
+            start_pos=(place, y_pos - 5),
+            end_pos=(place, y_pos + height + 5),
+            width=3
+        )
+
+        print(score.rock_meter)
 
 
 class Note(pygame.sprite.Sprite):
@@ -288,6 +331,8 @@ def render(screen, render_interval, score):
     visible_notes_list.draw(screen)
     # draw score
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
+
+    draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
 
     pygame.display.flip()
 
