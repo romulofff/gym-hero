@@ -117,10 +117,10 @@ def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
         )
 
 class Note(pygame.sprite.Sprite):
-    def __init__(self, imgs, color):
+    def __init__(self, imgs, color, note_type=0):
         super().__init__()
         self.start = 0
-        self.type = 0  # 0 = normal note, 1 = star
+        self.type = note_type  # 0 = normal note, 1 = star
         self.color = color
         self.duration = 0
         self.__set_image(imgs, self.color)
@@ -134,7 +134,7 @@ class Note(pygame.sprite.Sprite):
         return f'Note: start={self.start}, type={self.type}, color={self.color}, duration={self.duration}'
 
     def __set_image(self, imgs, color):
-        self.image = imgs[color]
+        self.image = imgs[color + self.type * 5]
         self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
 
@@ -158,10 +158,17 @@ def arg_parser():
 def load_imgs():
     imgs = []
 
-    for name in ['green', 'red', 'yellow', 'blue', 'orange']:
+    colors = ['green', 'red', 'yellow', 'blue', 'orange']
+    for name in colors:
         sprite = pygame.image.load(
             path.join('..', 'assets', name + 'button.png')).convert_alpha()
         imgs.append(sprite)
+
+    for name in colors:
+        sprite = pygame.image.load(
+            path.join('..', 'assets', name + 'star.png')).convert_alpha()
+        imgs.append(sprite)
+
 
     return imgs
 
