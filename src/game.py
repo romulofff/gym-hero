@@ -286,7 +286,7 @@ def update(score, ticks):
         song.ts = song.ts_dict[ticks]
 
     # Add the first 50 notes to the "visible" notes list (the ones that will be rendered)
-    visible_notes_list.add(all_notes_list.sprites()[300::-1])
+    visible_notes_list.add(all_notes_list.sprites()[50::-1])
 
     # Check for collisions
     green_notes_hit_list = pygame.sprite.spritecollide(
