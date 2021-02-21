@@ -27,19 +27,20 @@ game_is_running = True
 
 
 class Score():
-    def __init__(self):
+    def __init__(self, decrease_mode=False):
         self.value = 0
         self.x_pos = SCREEN_WIDTH - 100
         self.font_size = 25
-
+        self.decrease_mode = decrease_mode
         self._counter = 0
 
-    def add(self):
+    def hit(self):
         self._counter = min(self._counter + 1, 39)
         self.value += 10 * (1 + self._counter // 10)
 
-    def reset(self):
+    def miss(self):
         self._counter = 0
+        self.value -= 10 * self.decrease_mode
 
     @property
     def counter(self):
@@ -82,6 +83,7 @@ def arg_parser():
     parser.add_argument(
         "chart_file",
         help="Path to .CHART file.")
+    parser.add_argument('--decrease_score', action='store_true', help='enables the feature of decreasing the score for mistakes')
     return parser.parse_args()
 
 
@@ -378,7 +380,7 @@ if __name__ == "__main__":
         # buttons_sprites_list.add(note)
 
     # Game Loop
-    score = Score()
+    score = Score(decrease_mode=args.decrease_score)
     game_is_running = True
     clock = pygame.time.Clock()
 
