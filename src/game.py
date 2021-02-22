@@ -64,17 +64,18 @@ class Score():
     def multiplier(self):
         return 1 + self._counter // 10
 
-def draw_score_multiplier(score, surface, x_pos=0, y_pos=0, size=20):
-    #code slightly modified from draw score
+
+def draw_score_multiplier(score, surface, x_pos=0, y_pos=0, size=25):
+    # code slightly modified from draw score
     font = pygame.font.Font(
         pygame.font.match_font('arial'), size)
 
     value = score.multiplier
-    color = ((255, 255, 255),   #white for x1
-            (255, 255, 0),      #yellow for x2
-            (0, 255, 0),        #green for x3
-            (200, 0, 200)        #purple for x4
-        )[value - 1]
+    color = ((255, 255, 255),  # white for x1
+             (255, 255, 0),  # yellow for x2
+             (0, 255, 0),  # green for x3
+             (200, 0, 200)  # purple for x4
+             )[value - 1]
 
     multiplier = font.render(f"x{value}", True, color)
 
@@ -84,38 +85,39 @@ def draw_score_multiplier(score, surface, x_pos=0, y_pos=0, size=20):
 
 
 def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
-        height = 10
-        width = 20
+    height = 10
+    width = 20
 
-        #draws the first layer of the meeter,
-        #which consists of the 3 colors, but darkened
-        for i in range(3):
-            pygame.draw.rect(
-                surface,
-                (200 * (i < 2), 180 * (i > 0), 0),
-                (x_pos + i*width, y_pos, width, height)
-            )
-
-        #highlits the color the meeter is in, as if it light up
-        lightned_bar = int((score.rock_meter-1) * (3 / 100))
+    # draws the first layer of the meeter,
+    # which consists of the 3 colors, but darkened
+    for i in range(3):
         pygame.draw.rect(
-                surface,
-                (255 * (lightned_bar < 2), 255 * (lightned_bar > 0), 0),
-                (x_pos + lightned_bar*width, y_pos, width, height)
-            )
-
-        #locating the position on which the bar will be:
-        total_size = width * 3
-        place = x_pos + (score.rock_meter / 100) * total_size
-
-        #drawing the bar on top of meeter
-        pygame.draw.line(
             surface,
-            color=(255, 255, 255),
-            start_pos=(place, y_pos - 5),
-            end_pos=(place, y_pos + height + 5),
-            width=3
+            (200 * (i < 2), 180 * (i > 0), 0),
+            (x_pos + i*width, y_pos, width, height)
         )
+
+    # highlits the color the meeter is in, as if it light up
+    lightned_bar = int((score.rock_meter-1) * (3 / 100))
+    pygame.draw.rect(
+        surface,
+        (255 * (lightned_bar < 2), 255 * (lightned_bar > 0), 0),
+        (x_pos + lightned_bar*width, y_pos, width, height)
+    )
+
+    # locating the position on which the bar will be:
+    total_size = width * 3
+    place = x_pos + (score.rock_meter / 100) * total_size
+
+    # drawing the bar on top of meeter
+    pygame.draw.line(
+        surface,
+        color=(255, 255, 255),
+        start_pos=(place, y_pos - 5),
+        end_pos=(place, y_pos + height + 5),
+        width=3
+    )
+
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, song, imgs, start=0, note_type='N', color=None, duration=0):
@@ -145,7 +147,7 @@ class Note(pygame.sprite.Sprite):
         # TODO: Decide best way to start note's y values
         #note.y_pos = -(300 * note.start // song.resolution)
         self.y_pos = -(PIXELS_PER_BEAT * (self.start +
-                                  song.offset) / song.resolution)
+                                          song.offset) / song.resolution)
 
     def __repr__(self):
         return f'<Note start:{self.start} type:{self.type} color:{self.color} duration:{self.duration}>'
@@ -161,7 +163,7 @@ class Note(pygame.sprite.Sprite):
     def update(self, to_kill=None):
         self.rect.y = int(self.y_pos) + (SCREEN_HEIGHT-90)
         self.y_pos += (TICKS_PER_UPDATE * PIXELS_PER_BEAT / song.resolution)
-        
+
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
 
@@ -171,7 +173,8 @@ def arg_parser():
     parser.add_argument(
         "chart_file",
         help="Path to .CHART file.")
-    parser.add_argument('-d', '--decrease_score', action='store_true', help='enables the feature of decreasing the score for mistakes')
+    parser.add_argument('-d', '--decrease_score', action='store_true',
+                        help='enables the feature of decreasing the score for mistakes')
     return parser.parse_args()
 
 
@@ -188,7 +191,6 @@ def load_imgs():
         sprite = pygame.image.load(
             path.join('..', 'assets', name + 'star.png')).convert_alpha()
         imgs.append(sprite)
-
 
     return imgs
 
@@ -300,7 +302,7 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 
     notes_data = chart_data[inf:sup]
 
-    #pattern of the data for each note line
+    # pattern of the data for each note line
     #                   time    /  type / color / duration
     prog = re.compile("([0-9]+) = ([NS]) ([0-4]) ([0-9]+)")
     # time -> when the note is supposed to be played
@@ -359,8 +361,11 @@ def render(screen, render_interval, score):
 
     return
 
+
 recent_note_history = []
 # TODO: separar handle input do update
+
+
 def update(score, ticks):
     global game_is_running, recent_note_history
 
@@ -399,7 +404,7 @@ def update(score, ticks):
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
-    keys = 'asdfg' #could be a list, tuple or dict instead
+    keys = 'asdfg'  # could be a list, tuple or dict instead
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
@@ -407,14 +412,15 @@ def update(score, ticks):
 
         if event.type == pygame.KEYDOWN:
             for n, button_in_hit_zone in enumerate(Buttons_hit_list_by_color):
-                if event.key == getattr(pygame, f"K_{keys[n]}"): #Eg: event.key == pygame.K_a
+                # Eg: event.key == pygame.K_a
+                if event.key == getattr(pygame, f"K_{keys[n]}"):
                     if len(button_in_hit_zone) > 0:
                         button_in_hit_zone[0].update(True)
                         recent_note_history.remove(button_in_hit_zone[0])
 
                         score.hit()
                     else:
-                        #key was pressed but without any note
+                        # key was pressed but without any note
                         score.miss_click()
 
                     break
@@ -463,13 +469,12 @@ if __name__ == "__main__":
     song_audio.set_volume(0.3)
     song_audio.play()
 
-    
     ticks = 0
     update_ticks = 0
     start_ms = pygame.time.get_ticks()
-    
+
     print("The Game is Running now!")
-    
+
     while game_is_running:
         start_time = time.time()
 
@@ -483,9 +488,9 @@ if __name__ == "__main__":
         tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
         delta_ticks = tick_per_ms * delta_ms
         update_ticks += delta_ticks
-        
+
         num_updates = 0
-        
+
         while (TICKS_PER_UPDATE <= update_ticks):
             print('--------UPDATE-------')
             print(ticks)
@@ -498,7 +503,7 @@ if __name__ == "__main__":
 
         render_interval = update_ticks / TICKS_PER_UPDATE
         render(screen, render_interval, score)
-        
+
         clock.tick(60)
         # print(clock.get_time())
         # print(clock.get_rawtime())
