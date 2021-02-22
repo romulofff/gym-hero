@@ -9,7 +9,7 @@
   PreviewEnd = 0
   Genre = "rock"
   MediaType = "cd"
-  MusicStream = "song.ogg"
+  MusicStream = "song.wav"
 }
 [SyncTrack]
 {
