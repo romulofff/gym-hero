@@ -135,6 +135,15 @@ class Note(pygame.sprite.Sprite):
 
         self.rect.x = color_x_pos[self.color]
 
+        # note_beat = (note.start / float(song.resolution))# + song.offset
+        # TODO: lembrar de levar em consideração o offset
+        #print("NOTE BEAT:", note_beat)
+        #pixels_per_beat = (song.bpm / 60.0) * 360
+        #print("PPB:", pixels_per_beat)
+        #note.y_pos = (- (note_beat * pixels_per_beat)) / song.divisor
+        #print("Y:", note.y_pos)
+        # TODO: Decide best way to start note's y values
+        #note.y_pos = -(300 * note.start // song.resolution)
         self.y_pos = -(PIXELS_PER_BEAT * (self.start +
                                   song.offset) / song.resolution)
 
