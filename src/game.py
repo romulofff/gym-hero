@@ -1,4 +1,5 @@
 import argparse
+import re
 import time
 from os import path
 
@@ -117,15 +118,25 @@ def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
         )
 
 class Note(pygame.sprite.Sprite):
-    def __init__(self, imgs, color, note_type=0):
+    def __init__(self, song, imgs, start=0, note_type='N', color=None, duration=0):
+        if color is None:
+            raise TypeError("missing required argumet on note: color")
+        elif not note_type in ('N', 'S'):
+            raise TypeError("note_type must be 'N' or 'S'")
+
         super().__init__()
-        self.start = 0
-        self.type = note_type  # 0 = normal note, 1 = star
-        self.color = color
-        self.duration = 0
+        self.start = int(start)
+        self.type = 0 if note_type == 'N' else 1   # 0 = normal note, 1 = star
+        self.color = int(color)
+        self.duration = int(duration)
+
         self.__set_image(imgs, self.color)
         self.last_ticks = 0
-        self.y_pos = 0
+
+        self.rect.x = color_x_pos[self.color]
+
+        self.y_pos = -(PIXELS_PER_BEAT * (self.start +
+                                  song.offset) / song.resolution)
 
     def __repr__(self):
         return f'<Note start:{self.start} type:{self.type} color:{self.color} duration:{self.duration}>'
@@ -280,55 +291,25 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 
     notes_data = chart_data[inf:sup]
 
-    notes = []
-    stars = []
+    #pattern of the data for each note line
+    #                   time    /  type / color / duration
+    prog = re.compile("([0-9]+) = ([NS]) ([0-4]) ([0-9]+)")
+    # time -> when the note is supposed to be played
+    # type -> either normal or a star
+    # color -> green, red, yellow, blue or orange.
+    #           it has 0-4 so it gets only those 5 notes.
+    #           If desired, can be set 0-6 to have all 7 notes in the sheet
+    #           however, it requires the rest of the system to handle more
+    #           note possibilities
+    # duration -> allows to have any integer number as value.
+    #           Could check on re docs to figure out a maximum number of characters.
 
-    for line in notes_data.splitlines():
-        n = line.split()
+    # getting all line's data parsed
+    lines = prog.findall(notes_data)
 
-        # TODO: checar todos os intervalos validos
-        # ex: color (n[3] >= 0 e < 5)
-        if (n[2] == 'N') and (int(n[3]) < 5):
-            note = Note(imgs, int(n[3]))
-            # note.start = int(n[0]) - 120  # global_offset
-            note.start = int(n[0])  # global_offset
-
-            # print(note.start)
-
-            note.duration = int(n[4])
-            note.rect.x = color_x_pos[note.color]
-
-            # note_beat = (note.start / float(song.resolution))# + song.offset
-            # TODO: lembrar de levar em consideração o offset
-            #print("NOTE BEAT:", note_beat)
-            #pixels_per_beat = (song.bpm / 60.0) * 360
-            #print("PPB:", pixels_per_beat)
-            #note.y_pos = (- (note_beat * pixels_per_beat)) / song.divisor
-            #print("Y:", note.y_pos)
-            # TODO: Decide best way to start note's y values
-            #note.y_pos = -(300 * note.start // song.resolution)
-            note.y_pos = -(PIXELS_PER_BEAT * (note.start +
-                                              song.offset) / song.resolution)
-            #print("y: ", note.y_pos)
-            notes.append(note)
-
-        if (n[2] == 'S'):
-            stars.append(int(n[0]))
-            stars.append(int(n[0])+int(n[4]))
-
-    # set stars
-    s = 0
-
-    for i in range(len(notes)):
-        if (s >= len(stars)):
-            break
-
-        if (notes[i].start >= stars[s]):
-            if (notes[i].start <= stars[s+1]):
-                notes[i].type = 1
-            else:
-                s += 2
-                i -= 1
+    # using list comprehension to create a list of all the notes
+    # and parsing the required information to the Note constructor
+    notes = [Note(song, imgs, *line) for line in lines]
 
     return notes
 
