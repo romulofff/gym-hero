@@ -32,13 +32,15 @@ class Score():
         self.x_pos = SCREEN_WIDTH - 100
         self.font_size = 25
         self.decrease_mode = decrease_mode
+
+        # The ammount of notes correctly hit in a row
         self._counter = 0
 
         self.rock_meter = 50
 
-    def hit(self):
+    def hit(self, value=10):
         self._counter = min(self._counter + 1, 39)
-        self.value += 10 * (1 + self._counter // 10)
+        self.value += value * self.multiplier
 
         self.rock_meter = min(self.rock_meter + 2, 100)
 
@@ -56,7 +58,30 @@ class Score():
     @property
     def counter(self):
         return self._counter + 1
-    
+
+    @property
+    def multiplier(self):
+        return 1 + self._counter // 10
+
+def draw_score_multiplier(score, surface, x_pos=0, y_pos=0, size=20):
+    #code slightly modified from draw score
+    font = pygame.font.Font(
+        pygame.font.match_font('arial'), size)
+
+    value = score.multiplier
+    color = ((255, 255, 255),   #white for x1
+            (255, 255, 0),      #yellow for x2
+            (0, 255, 0),        #green for x3
+            (200, 0, 200)        #purple for x4
+        )[value - 1]
+
+    multiplier = font.render(f"x{value}", True, color)
+
+    multiplier_rect = multiplier.get_rect()
+    multiplier_rect.midtop = (x_pos, y_pos)
+    screen.blit(multiplier, multiplier_rect)
+
+
 def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
         height = 10
         width = 20
@@ -90,23 +115,6 @@ def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
             end_pos=(place, y_pos + height + 5),
             width=3
         )
-
-        print(score.rock_meter)
-
-        self._counter = 0
-
-    def add(self):
-        self._counter = min(self._counter + 1, 39)
-        self.value += 10 * (1 + self._counter // 10)
-
-    def reset(self):
-        self._counter = 0
-
-    @property
-    def counter(self):
-        return self._counter + 1
-    
-
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, imgs, color):
@@ -347,6 +355,8 @@ def render(screen, render_interval, score):
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
 
     draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
+
+    draw_score_multiplier(score, screen, x_pos=70, y_pos=600)
 
     pygame.display.flip()
 
