@@ -355,7 +355,7 @@ def render(screen, render_interval, score):
 
     draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
 
-    draw_score_multiplier(score, screen, x_pos=70, y_pos=600)
+    draw_score_multiplier(score, screen, x_pos=100, y_pos=600)
 
     pygame.display.flip()
 
