@@ -5,7 +5,7 @@ Preciso ler um 'chart' correspondente a alguma música e reproduzir as notas e o
 - Ler os charts [FEITO]
 - Criar e Renderizar notas de acordo com o chart [FEITO]
 - Separar a lista de colisão da lista de notas renderizadas
-- Música deve tocar junto
+- Música deve tocar junto [FEITO]
 - Implementar notas longas
 - Implementar notas estrela
 - Implementar o TS
@@ -19,11 +19,11 @@ Preciso detectar quando a nota colidir com o botão. Isso deve acontecer, caso o
 ### SCORE POINTS:
 - Atualizar valor quando houver colisão [FEITO]
 - Opção para diminuir caso o jogador erre
-- Implementar multiplicador (a cada 10 notas aumenta em 1, máximo x4)
+- Implementar multiplicador (a cada 10 notas aumenta em 1, máximo x4) [FEITO]
 
 ### PÚBLICO:
 A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o público fica insatisfeito e te expulsa do palco (com vaias e xingamentos)
-- Implementar Torcida
+- Implementar Torcida [FEITO]
 
 ### AMBIENTE GYM:
 - Implementar ambiente GYM
