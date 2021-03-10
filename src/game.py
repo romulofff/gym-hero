@@ -3,10 +3,11 @@ import re
 import time
 from os import path
 
+import numpy as np
 import pygame
 from pygame import mixer
 
-from utils import draw_line, draw_score
+from utils import draw_score
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
@@ -326,8 +327,19 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 
 
 def handle_inputs():
-    return
+    keys = 'asdfg'  # could be a list, tuple or dict instead
+    actions = [False, False, False, False, False]
+    for event in pygame.event.get():
 
+        if event.type == pygame.KEYDOWN:
+            for n, l in enumerate(keys):
+                if event.key == getattr(pygame, f"K_{l}"):
+                    actions[n] = True
+                else:
+                    actions[n] = False
+        
+        print(actions)
+    
 
 def render(screen, render_interval, score):
     # Draw Phase
@@ -366,7 +378,7 @@ recent_note_history = []
 # TODO: separar handle input do update
 
 
-def update(score, ticks):
+def update(score, ticks, action):
     global game_is_running, recent_note_history
 
     # Poorly updates song BPM and TS values
@@ -404,26 +416,29 @@ def update(score, ticks):
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
-    keys = 'asdfg'  # could be a list, tuple or dict instead
-    for event in pygame.event.get():
+    # keys = 'asdfg'  # could be a list, tuple or dict instead
+    # for event in pygame.event.get():
+    for i in range(len(action)):
 
-        if event.type == pygame.QUIT:
-            game_is_running = False
+        # if event.type == pygame.QUIT:
+        #     game_is_running = False
 
-        if event.type == pygame.KEYDOWN:
-            for n, button_in_hit_zone in enumerate(Buttons_hit_list_by_color):
-                # Eg: event.key == pygame.K_a
-                if event.key == getattr(pygame, f"K_{keys[n]}"):
-                    if len(button_in_hit_zone) > 0:
-                        button_in_hit_zone[0].update(True)
-                        recent_note_history.remove(button_in_hit_zone[0])
+        # if event.type == pygame.KEYDOWN:
+        # if action[i]:
+        for n, notes_in_hit_zone in enumerate(Buttons_hit_list_by_color):
+            # Eg: event.key == pygame.K_a
+            # if event.key == getattr(pygame, f"K_{keys[n]}"):
+            if action[i] and i == n:
+                if len(notes_in_hit_zone) > 0:
+                    notes_in_hit_zone[0].update(True)
+                    recent_note_history.remove(notes_in_hit_zone[0])
 
-                        score.hit()
-                    else:
-                        # key was pressed but without any note
-                        score.miss_click()
+                    score.hit()
+                else:
+                    # key was pressed but without any note
+                    score.miss_click()
 
-                    break
+                break
                     # exits the inner for
                     # So, those ifs work as if-elif even inside the for loop
 
@@ -433,6 +448,18 @@ def update(score, ticks):
     # If there are no more notes, end the game
     if len(all_notes_list) == 0:
         game_is_running = False
+
+
+def step(action):
+
+    update(score, ticks, action)
+
+    rgb_array = pygame.surfarray.array3d(screen)
+
+    reward = 0
+    new_state = np.asarray(rgb_array, dtype=np.uint8)
+    done = False
+    return reward, new_state, done
 
 
 if __name__ == "__main__":
@@ -466,8 +493,8 @@ if __name__ == "__main__":
     audio_name = '../charts/' + song.name
     print("You are playing {}.".format(audio_name))
     song_audio = mixer.Sound(audio_name)
-    song_audio.set_volume(0.3)
-    song_audio.play()
+    song_audio.set_volume(0.1)
+    # song_audio.play()
 
     ticks = 0
     update_ticks = 0
@@ -476,6 +503,10 @@ if __name__ == "__main__":
     print("The Game is Running now!")
 
     while game_is_running:
+        
+
+        step(action)    
+    
         start_time = time.time()
 
         current_ms = pygame.time.get_ticks()
@@ -492,14 +523,14 @@ if __name__ == "__main__":
         num_updates = 0
 
         while (TICKS_PER_UPDATE <= update_ticks):
-            print('--------UPDATE-------')
-            print(ticks)
+            # print('--------UPDATE-------')
+            # print(ticks)
+            # handle_inputs()
             update(score, ticks)
             update_ticks -= TICKS_PER_UPDATE
             num_updates += 1
             ticks += TICKS_PER_UPDATE
 
-        handle_inputs()
 
         render_interval = update_ticks / TICKS_PER_UPDATE
         render(screen, render_interval, score)
@@ -517,3 +548,4 @@ if __name__ == "__main__":
     mixer.quit()
 
     pygame.quit()
+
