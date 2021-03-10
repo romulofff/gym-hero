@@ -50,8 +50,8 @@ class Score():
         self._counter = 0
 
         self.rock_meter -= 2
-        if self.rock_meter <= 0:
-            raise NotImplementedError("Game lost, rock meater -> 0")
+        # if self.rock_meter <= 0:
+        #     raise NotImplementedError("Game lost, rock meater -> 0")
 
     def miss_click(self):
         self.miss()
@@ -331,16 +331,20 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 def handle_inputs():
     keys = 'asdfg'  # could be a list, tuple or dict instead
     actions = [False, False, False, False, False]
-    for event in pygame.event.get():
+    pygame.key.set_repeat()
+    events = pygame.event.get()
+    # print(events)
+    pressed = pygame.key.get_pressed()
+        # for key in pressed:
+        
+    for n, l in enumerate(keys):
+        # print(pressed[getattr(pygame, f"K_{l}")])
+        if pressed[getattr(pygame, f"K_{l}")]:
+            actions[n] = True
+            # print(actions)
+        else:
+            actions[n] = False
 
-        if event.type == pygame.KEYDOWN:
-            for n, l in enumerate(keys):
-                if event.key == getattr(pygame, f"K_{l}"):
-                    actions[n] = True
-                else:
-                    actions[n] = False
-
-            print(actions)
     return actions
 
 
@@ -382,6 +386,7 @@ recent_note_history = []
 
 
 def update(score, ticks, action):
+    print(action)
     global game_is_running, recent_note_history
 
     # Poorly updates song BPM and TS values
@@ -496,7 +501,7 @@ if __name__ == "__main__":
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
+    pygame.key.set_repeat()
     imgs = load_imgs()
 
     song, notes = load_chart(args.chart_file, imgs)
