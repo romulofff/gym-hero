@@ -27,6 +27,11 @@ A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o 
 
 ### AMBIENTE GYM:
 - Implementar ambiente GYM
+- Criar função step:
+    - Recebe ação como entrada
+    - Retorna recompensa, novo estado e o "done"
+
+- Criar vetor de entrada de ações [bool, bool, bool, bool, bool]
 
 ### TESTE DE FEATURES
 - Poder retornar o array de screen buffer, label buffer e depth buffer (se tiver)
