@@ -38,7 +38,7 @@ white = (255, 255, 255)
 def draw_score(score_screen, score_points, size, x_position):
     """ Draws score points on the screen """
     _x = x_position
-    _y = 50
+    _y = 500
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(score_points, True, white)
     text_rect = text_surface.get_rect()
