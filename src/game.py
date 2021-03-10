@@ -175,7 +175,9 @@ def arg_parser():
         "chart_file",
         help="Path to .CHART file.")
     parser.add_argument('-d', '--decrease_score', action='store_true',
-                        help='enables the feature of decreasing the score for mistakes')
+                        help='enables the feature of decreasing the score for mistakes.')
+    parser.add_argument('--human', action='store_true',
+                        help='enables human controls through keyboard.')
     return parser.parse_args()
 
 
@@ -337,9 +339,10 @@ def handle_inputs():
                     actions[n] = True
                 else:
                     actions[n] = False
-        
-        print(actions)
-    
+
+            print(actions)
+    return actions
+
 
 def render(screen, render_interval, score):
     # Draw Phase
@@ -439,26 +442,51 @@ def update(score, ticks, action):
                     score.miss_click()
 
                 break
-                    # exits the inner for
-                    # So, those ifs work as if-elif even inside the for loop
+                # exits the inner for
+                # So, those ifs work as if-elif even inside the for loop
 
     # Move notes down
     all_notes_list.update(ticks)
 
     # If there are no more notes, end the game
+    done = False
     if len(all_notes_list) == 0:
         game_is_running = False
+        done = True
+    return done
 
 
 def step(action):
+    global start_ms, update_ticks, done, ticks
+    current_ms = pygame.time.get_ticks()
+    delta_ms = current_ms - start_ms
+    #delta_ms = clock.get_time()
+    start_ms = current_ms
+    # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+    #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
+    tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
+    delta_ticks = tick_per_ms * delta_ms
+    update_ticks += delta_ticks
+    num_updates = 0
 
-    update(score, ticks, action)
+    while (TICKS_PER_UPDATE <= update_ticks):
+        # print('--------UPDATE-------')
+        # print(ticks)
+        # handle_inputs()
+        done = update(score, ticks, action)
+        update_ticks -= TICKS_PER_UPDATE
+        num_updates += 1
+        ticks += TICKS_PER_UPDATE
 
+    render_interval = update_ticks / TICKS_PER_UPDATE
+    render(screen, render_interval, score)
     rgb_array = pygame.surfarray.array3d(screen)
+
+    clock.tick(60)
 
     reward = 0
     new_state = np.asarray(rgb_array, dtype=np.uint8)
-    done = False
+
     return reward, new_state, done
 
 
@@ -494,48 +522,23 @@ if __name__ == "__main__":
     print("You are playing {}.".format(audio_name))
     song_audio = mixer.Sound(audio_name)
     song_audio.set_volume(0.1)
-    # song_audio.play()
+    song_audio.play()
 
     ticks = 0
-    update_ticks = 0
+    update_ticks = 0 
     start_ms = pygame.time.get_ticks()
-
+    done = False
     print("The Game is Running now!")
 
     while game_is_running:
-        
-
-        step(action)    
-    
         start_time = time.time()
 
-        current_ms = pygame.time.get_ticks()
-        delta_ms = current_ms - start_ms
-        #delta_ms = clock.get_time()
-        start_ms = current_ms
+        action = handle_inputs()
+        # if action[0]:
+        # print("Entering Step")
+        step(action)
+        # print("Leaving Step")
 
-        # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
-        #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
-        tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
-        delta_ticks = tick_per_ms * delta_ms
-        update_ticks += delta_ticks
-
-        num_updates = 0
-
-        while (TICKS_PER_UPDATE <= update_ticks):
-            # print('--------UPDATE-------')
-            # print(ticks)
-            # handle_inputs()
-            update(score, ticks)
-            update_ticks -= TICKS_PER_UPDATE
-            num_updates += 1
-            ticks += TICKS_PER_UPDATE
-
-
-        render_interval = update_ticks / TICKS_PER_UPDATE
-        render(screen, render_interval, score)
-
-        clock.tick(60)
         # print(clock.get_time())
         # print(clock.get_rawtime())
         # print(clock.get_fps())
@@ -548,4 +551,3 @@ if __name__ == "__main__":
     mixer.quit()
 
     pygame.quit()
-
