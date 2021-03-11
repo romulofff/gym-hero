@@ -7,7 +7,7 @@ import numpy as np
 import pygame
 from pygame import mixer
 
-from utils import draw_score
+from utils import draw_score, draw_score_multiplier, draw_rock_meter
 from action import Action
 
 
@@ -66,60 +66,6 @@ class Score():
     @property
     def multiplier(self):
         return 1 + self._counter // 10
-
-
-def draw_score_multiplier(score, surface, x_pos=0, y_pos=0, size=25):
-    # code slightly modified from draw score
-    font = pygame.font.Font(
-        pygame.font.match_font('arial'), size)
-
-    value = score.multiplier
-    color = ((255, 255, 255),  # white for x1
-             (255, 255, 0),  # yellow for x2
-             (0, 255, 0),  # green for x3
-             (200, 0, 200)  # purple for x4
-             )[value - 1]
-
-    multiplier = font.render(f"x{value}", True, color)
-
-    multiplier_rect = multiplier.get_rect()
-    multiplier_rect.midtop = (x_pos, y_pos)
-    screen.blit(multiplier, multiplier_rect)
-
-
-def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
-    height = 10
-    width = 20
-
-    # draws the first layer of the meeter,
-    # which consists of the 3 colors, but darkened
-    for i in range(3):
-        pygame.draw.rect(
-            surface,
-            (200 * (i < 2), 180 * (i > 0), 0),
-            (x_pos + i*width, y_pos, width, height)
-        )
-
-    # highlits the color the meeter is in, as if it light up
-    lightned_bar = int((score.rock_meter-1) * (3 / 100))
-    pygame.draw.rect(
-        surface,
-        (255 * (lightned_bar < 2), 255 * (lightned_bar > 0), 0),
-        (x_pos + lightned_bar*width, y_pos, width, height)
-    )
-
-    # locating the position on which the bar will be:
-    total_size = width * 3
-    place = x_pos + (score.rock_meter / 100) * total_size
-
-    # drawing the bar on top of meeter
-    pygame.draw.line(
-        surface,
-        color=(255, 255, 255),
-        start_pos=(place, y_pos - 5),
-        end_pos=(place, y_pos + height + 5),
-        width=3
-    )
 
 
 class Note(pygame.sprite.Sprite):
@@ -345,6 +291,7 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 
     # return actions
 handle_input = Action()
+
 
 def render(screen, render_interval, score):
     # Draw Phase
