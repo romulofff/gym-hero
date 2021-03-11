@@ -8,6 +8,8 @@ import pygame
 from pygame import mixer
 
 from utils import draw_score
+from action import Action
+
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
@@ -328,25 +330,21 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
     return notes
 
 
-def handle_inputs():
-    keys = 'asdfg'  # could be a list, tuple or dict instead
-    actions = [False, False, False, False, False]
-    pygame.key.set_repeat()
-    events = pygame.event.get()
-    # print(events)
-    pressed = pygame.key.get_pressed()
-        # for key in pressed:
-        
-    for n, l in enumerate(keys):
-        # print(pressed[getattr(pygame, f"K_{l}")])
-        if pressed[getattr(pygame, f"K_{l}")]:
-            actions[n] = True
-            # print(actions)
-        else:
-            actions[n] = False
+# def handle_inputs():
+    # keys = 'asdfg'  # could be a list, tuple or dict instead
+    # actions = [False, False, False, False, False]
+    # for event in pygame.event.get():
 
-    return actions
+    #     if event.type == pygame.KEYDOWN:
+    #         for n, key in enumerate(keys):
+    #             if event.key == getattr(pygame, f"K_{key}"):
+    #                 actions[n] = True
 
+    # if any(actions):
+    #     print(actions)
+
+    # return actions
+handle_input = Action()
 
 def render(screen, render_interval, score):
     # Draw Phase
@@ -372,7 +370,7 @@ def render(screen, render_interval, score):
     # draw score
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
 
-    draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
+    # draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
 
     draw_score_multiplier(score, screen, x_pos=100, y_pos=600)
 
@@ -386,7 +384,6 @@ recent_note_history = []
 
 
 def update(score, ticks, action):
-    print(action)
     global game_is_running, recent_note_history
 
     # Poorly updates song BPM and TS values
@@ -426,29 +423,19 @@ def update(score, ticks, action):
 
     # keys = 'asdfg'  # could be a list, tuple or dict instead
     # for event in pygame.event.get():
-    for i in range(len(action)):
 
-        # if event.type == pygame.QUIT:
-        #     game_is_running = False
+    for n, notes_in_hit_zone in enumerate(Buttons_hit_list_by_color):
+        # Eg: event.key == pygame.K_a
+        # if event.key == getattr(pygame, f"K_{keys[n]}"):
+        if action[n]:
+            if len(notes_in_hit_zone) > 0:
+                notes_in_hit_zone[0].update(True)
+                recent_note_history.remove(notes_in_hit_zone[0])
 
-        # if event.type == pygame.KEYDOWN:
-        # if action[i]:
-        for n, notes_in_hit_zone in enumerate(Buttons_hit_list_by_color):
-            # Eg: event.key == pygame.K_a
-            # if event.key == getattr(pygame, f"K_{keys[n]}"):
-            if action[i] and i == n:
-                if len(notes_in_hit_zone) > 0:
-                    notes_in_hit_zone[0].update(True)
-                    recent_note_history.remove(notes_in_hit_zone[0])
-
-                    score.hit()
-                else:
-                    # key was pressed but without any note
-                    score.miss_click()
-
-                break
-                # exits the inner for
-                # So, those ifs work as if-elif even inside the for loop
+                score.hit()
+            else:
+                # key was pressed but without any note
+                score.miss_click()
 
     # Move notes down
     all_notes_list.update(ticks)
@@ -501,7 +488,6 @@ if __name__ == "__main__":
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.key.set_repeat()
     imgs = load_imgs()
 
     song, notes = load_chart(args.chart_file, imgs)
@@ -530,7 +516,7 @@ if __name__ == "__main__":
     song_audio.play()
 
     ticks = 0
-    update_ticks = 0 
+    update_ticks = 0
     start_ms = pygame.time.get_ticks()
     done = False
     print("The Game is Running now!")
@@ -538,8 +524,7 @@ if __name__ == "__main__":
     while game_is_running:
         start_time = time.time()
 
-        action = handle_inputs()
-        # if action[0]:
+        action = handle_input()
         # print("Entering Step")
         step(action)
         # print("Leaving Step")
