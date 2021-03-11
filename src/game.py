@@ -7,10 +7,9 @@ import numpy as np
 import pygame
 from pygame import mixer
 
-from utils import draw_score, draw_score_multiplier, draw_rock_meter
 from action import Action
 from score import Score
-
+from utils import draw_rock_meter, draw_score, draw_score_multiplier
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
