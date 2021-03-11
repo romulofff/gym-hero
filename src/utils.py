@@ -2,6 +2,22 @@ import pygame
 from pygame import draw
 
 
+def handle_inputs():
+    keys = 'asdfg'  # could be a list, tuple or dict instead
+    actions = [False, False, False, False, False]
+    for event in pygame.event.get():
+
+        if event.type == pygame.KEYDOWN:
+            for n, key in enumerate(keys):
+                if event.key == getattr(pygame, f"K_{key}"):
+                    actions[n] = True
+
+    if any(actions):
+        print(actions)
+
+    return actions
+
+
 def draw_line(screen):
     """ Draw the lines where the notes will roll """
     height = screen.get_height()
@@ -42,7 +58,7 @@ white = (255, 255, 255)
 def draw_score(score_screen, score_points, size, x_position):
     """ Draws score points on the screen """
     _x = x_position
-    _y = 500
+    _y = 550
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(score_points, True, white)
     text_rect = text_surface.get_rect()

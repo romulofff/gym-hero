@@ -9,6 +9,7 @@ from pygame import mixer
 
 from utils import draw_score, draw_score_multiplier, draw_rock_meter
 from action import Action
+from score import Score
 
 
 FRET_HEIGHT = 256
@@ -25,47 +26,6 @@ PIXELS_PER_BEAT = 400
 # 20 -> 850
 
 color_x_pos = [163, 227, 291, 355, 419]
-
-# global_speed = 1
-game_is_running = True
-
-
-class Score():
-    def __init__(self, decrease_mode=False):
-        self.value = 0
-        self.x_pos = SCREEN_WIDTH - 100
-        self.font_size = 25
-        self.decrease_mode = decrease_mode
-
-        # The ammount of notes correctly hit in a row
-        self._counter = 0
-
-        self.rock_meter = 50
-
-    def hit(self, value=10):
-        self._counter = min(self._counter + 1, 39)
-        self.value += value * self.multiplier
-
-        self.rock_meter = min(self.rock_meter + 2, 100)
-
-    def miss(self):
-        self._counter = 0
-
-        self.rock_meter -= 2
-        # if self.rock_meter <= 0:
-        #     raise NotImplementedError("Game lost, rock meater -> 0")
-
-    def miss_click(self):
-        self.miss()
-        self.value -= 10 * self.decrease_mode
-
-    @property
-    def counter(self):
-        return self._counter + 1
-
-    @property
-    def multiplier(self):
-        return 1 + self._counter // 10
 
 
 class Note(pygame.sprite.Sprite):
@@ -117,6 +77,19 @@ class Note(pygame.sprite.Sprite):
             self.kill()
 
 
+class Song():
+    def __init__(self):
+        self.offset = 0
+        self.resolution = 192
+        self.bpm = 120  # Must be read from chart on [SyncTrack]
+        self.divisor = 3
+        self.name = ''
+        self.guitar = ''
+        self.bpm_dict = {}  # Should be a matrix
+        self.ts = 4
+        self.ts_dict = {}  # Should be a matrix
+
+
 def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -164,19 +137,6 @@ def create_button(img, x_pos):
     button.rect.y = SCREEN_HEIGHT-90
     button.rect.x = x_pos
     return button
-
-
-class Song():
-    def __init__(self):
-        self.offset = 0
-        self.resolution = 192
-        self.bpm = 120  # Must be read from chart on [SyncTrack]
-        self.divisor = 3
-        self.name = ''
-        self.guitar = ''
-        self.bpm_dict = {}  # Should be a matrix
-        self.ts = 4
-        self.ts_dict = {}  # Should be a matrix
 
 
 def load_chart(filename, imgs):
@@ -276,20 +236,6 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
     return notes
 
 
-# def handle_inputs():
-    # keys = 'asdfg'  # could be a list, tuple or dict instead
-    # actions = [False, False, False, False, False]
-    # for event in pygame.event.get():
-
-    #     if event.type == pygame.KEYDOWN:
-    #         for n, key in enumerate(keys):
-    #             if event.key == getattr(pygame, f"K_{key}"):
-    #                 actions[n] = True
-
-    # if any(actions):
-    #     print(actions)
-
-    # return actions
 handle_input = Action()
 
 
