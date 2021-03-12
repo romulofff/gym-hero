@@ -6,7 +6,8 @@ from os import path
 import pygame
 from pygame import mixer
 
-from utils import draw_line, draw_score
+from score import Score
+from utils import draw_line, draw_rock_meter, draw_score, draw_score_multiplier
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
@@ -25,98 +26,6 @@ color_x_pos = [163, 227, 291, 355, 419]
 
 # global_speed = 1
 game_is_running = True
-
-
-class Score():
-    def __init__(self, decrease_mode=False):
-        self.value = 0
-        self.x_pos = SCREEN_WIDTH - 100
-        self.font_size = 25
-        self.decrease_mode = decrease_mode
-
-        # The ammount of notes correctly hit in a row
-        self._counter = 0
-
-        self.rock_meter = 50
-
-    def hit(self, value=10):
-        self._counter = min(self._counter + 1, 39)
-        self.value += value * self.multiplier
-
-        self.rock_meter = min(self.rock_meter + 2, 100)
-
-    def miss(self):
-        self._counter = 0
-
-        self.rock_meter -= 2
-        if self.rock_meter <= 0:
-            raise NotImplementedError("Game lost, rock meater -> 0")
-
-    def miss_click(self):
-        self.miss()
-        self.value -= 10 * self.decrease_mode
-
-    @property
-    def counter(self):
-        return self._counter + 1
-
-    @property
-    def multiplier(self):
-        return 1 + self._counter // 10
-
-
-def draw_score_multiplier(score, surface, x_pos=0, y_pos=0, size=25):
-    # code slightly modified from draw score
-    font = pygame.font.Font(
-        pygame.font.match_font('arial'), size)
-
-    value = score.multiplier
-    color = ((255, 255, 255),  # white for x1
-             (255, 255, 0),  # yellow for x2
-             (0, 255, 0),  # green for x3
-             (200, 0, 200)  # purple for x4
-             )[value - 1]
-
-    multiplier = font.render(f"x{value}", True, color)
-
-    multiplier_rect = multiplier.get_rect()
-    multiplier_rect.midtop = (x_pos, y_pos)
-    screen.blit(multiplier, multiplier_rect)
-
-
-def draw_rock_meter(score, surface, x_pos=0, y_pos=0):
-    height = 10
-    width = 20
-
-    # draws the first layer of the meeter,
-    # which consists of the 3 colors, but darkened
-    for i in range(3):
-        pygame.draw.rect(
-            surface,
-            (200 * (i < 2), 180 * (i > 0), 0),
-            (x_pos + i*width, y_pos, width, height)
-        )
-
-    # highlits the color the meeter is in, as if it light up
-    lightned_bar = int((score.rock_meter-1) * (3 / 100))
-    pygame.draw.rect(
-        surface,
-        (255 * (lightned_bar < 2), 255 * (lightned_bar > 0), 0),
-        (x_pos + lightned_bar*width, y_pos, width, height)
-    )
-
-    # locating the position on which the bar will be:
-    total_size = width * 3
-    place = x_pos + (score.rock_meter / 100) * total_size
-
-    # drawing the bar on top of meeter
-    pygame.draw.line(
-        surface,
-        color=(255, 255, 255),
-        start_pos=(place, y_pos - 5),
-        end_pos=(place, y_pos + height + 5),
-        width=3
-    )
 
 
 class Note(pygame.sprite.Sprite):
@@ -162,7 +71,7 @@ class Note(pygame.sprite.Sprite):
 
     def update(self, to_kill=None):
         self.rect.y = int(self.y_pos) + (SCREEN_HEIGHT-90)
-        self.y_pos += (TICKS_PER_UPDATE * PIXELS_PER_BEAT / song.resolution)
+        self.y_pos += 12
 
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
@@ -353,7 +262,7 @@ def render(screen, render_interval, score):
     # draw score
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
 
-    draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
+    draw_rock_meter(score, screen, x_pos=SCREEN_WIDTH-100, y_pos=600)
 
     draw_score_multiplier(score, screen, x_pos=100, y_pos=600)
 
@@ -478,26 +387,7 @@ if __name__ == "__main__":
     while game_is_running:
         start_time = time.time()
 
-        current_ms = pygame.time.get_ticks()
-        delta_ms = current_ms - start_ms
-        #delta_ms = clock.get_time()
-        start_ms = current_ms
-
-        # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
-        #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
-        tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
-        delta_ticks = tick_per_ms * delta_ms
-        update_ticks += delta_ticks
-
-        num_updates = 0
-
-        while (TICKS_PER_UPDATE <= update_ticks):
-            print('--------UPDATE-------')
-            print(ticks)
-            update(score, ticks)
-            update_ticks -= TICKS_PER_UPDATE
-            num_updates += 1
-            ticks += TICKS_PER_UPDATE
+        update(score, ticks)
 
         handle_inputs()
 
