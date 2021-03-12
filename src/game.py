@@ -1,19 +1,22 @@
 import argparse
 import re
+import sys
 import time
 from os import path
 
+import numpy as np
 import pygame
 from pygame import mixer
 
+from action import Action
 from score import Score
-from utils import draw_line, draw_rock_meter, draw_score, draw_score_multiplier
+from utils import draw_rock_meter, draw_score, draw_score_multiplier
 
 FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 720
 # TODO: com TICKS_PER_UPDATE = 1 ta quebrando
-TICKS_PER_UPDATE = 5
+TICKS_PER_UPDATE = 3
 MS_PER_MIN = 60000
 
 # TODO: qdo aumenta mto, da errado (ex 500)
@@ -23,9 +26,6 @@ PIXELS_PER_BEAT = 400
 # 20 -> 850
 
 color_x_pos = [163, 227, 291, 355, 419]
-
-# global_speed = 1
-game_is_running = True
 
 
 class Note(pygame.sprite.Sprite):
@@ -77,13 +77,28 @@ class Note(pygame.sprite.Sprite):
             self.kill()
 
 
+class Song():
+    def __init__(self):
+        self.offset = 0
+        self.resolution = 192
+        self.bpm = 120  # Must be read from chart on [SyncTrack]
+        self.divisor = 3
+        self.name = ''
+        self.guitar = ''
+        self.bpm_dict = {}  # Should be a matrix
+        self.ts = 4
+        self.ts_dict = {}  # Should be a matrix
+
+
 def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "chart_file",
         help="Path to .CHART file.")
     parser.add_argument('-d', '--decrease_score', action='store_true',
-                        help='enables the feature of decreasing the score for mistakes')
+                        help='enables the feature of decreasing the score for mistakes.')
+    parser.add_argument('--human', action='store_true',
+                        help='enables human controls through keyboard.')
     return parser.parse_args()
 
 
@@ -122,19 +137,6 @@ def create_button(img, x_pos):
     button.rect.y = SCREEN_HEIGHT-90
     button.rect.x = x_pos
     return button
-
-
-class Song():
-    def __init__(self):
-        self.offset = 0
-        self.resolution = 192
-        self.bpm = 120  # Must be read from chart on [SyncTrack]
-        self.divisor = 3
-        self.name = ''
-        self.guitar = ''
-        self.bpm_dict = {}  # Should be a matrix
-        self.ts = 4
-        self.ts_dict = {}  # Should be a matrix
 
 
 def load_chart(filename, imgs):
@@ -234,8 +236,7 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
     return notes
 
 
-def handle_inputs():
-    return
+handle_input = Action()
 
 
 def render(screen, render_interval, score):
@@ -275,9 +276,9 @@ recent_note_history = []
 # TODO: separar handle input do update
 
 
-def update(score, ticks):
+def update(score, ticks, action):
     global game_is_running, recent_note_history
-
+    reward = None
     # Poorly updates song BPM and TS values
     if ticks in song.bpm_dict:
         song.bpm = song.bpm_dict[ticks]
@@ -309,39 +310,77 @@ def update(score, ticks):
         if not note in Buttons_hit_list:
 
             score.miss()
-
+            reward = -1
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
-    keys = 'asdfg'  # could be a list, tuple or dict instead
-    for event in pygame.event.get():
+    # keys = 'asdfg'  # could be a list, tuple or dict instead
+    # for event in pygame.event.get():
 
-        if event.type == pygame.QUIT:
-            game_is_running = False
+    for n, notes_in_hit_zone in enumerate(Buttons_hit_list_by_color):
+        # Eg: event.key == pygame.K_a
+        # if event.key == getattr(pygame, f"K_{keys[n]}"):
+        if action[n]:
+            if len(notes_in_hit_zone) > 0:
+                notes_in_hit_zone[0].update(True)
+                recent_note_history.remove(notes_in_hit_zone[0])
 
-        if event.type == pygame.KEYDOWN:
-            for n, button_in_hit_zone in enumerate(Buttons_hit_list_by_color):
-                # Eg: event.key == pygame.K_a
-                if event.key == getattr(pygame, f"K_{keys[n]}"):
-                    if len(button_in_hit_zone) > 0:
-                        button_in_hit_zone[0].update(True)
-                        recent_note_history.remove(button_in_hit_zone[0])
-
-                        score.hit()
-                    else:
-                        # key was pressed but without any note
-                        score.miss_click()
-
-                    break
-                    # exits the inner for
-                    # So, those ifs work as if-elif even inside the for loop
+                score.hit()
+                reward = 1
+            else:
+                # key was pressed but without any note
+                score.miss_click()
+                reward = -1
 
     # Move notes down
     all_notes_list.update(ticks)
 
     # If there are no more notes, end the game
+    done = False
     if len(all_notes_list) == 0:
         game_is_running = False
+        done = True
+    return done, reward
+
+
+def step(action):
+    global start_ms, update_ticks, done, ticks
+    reward = None
+    current_ms = pygame.time.get_ticks()
+    delta_ms = current_ms - start_ms
+    #delta_ms = clock.get_time()
+    start_ms = current_ms
+    # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
+    #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
+    tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
+    delta_ticks = tick_per_ms * delta_ms
+    update_ticks += delta_ticks
+    num_updates = 0
+
+    while (TICKS_PER_UPDATE <= update_ticks):
+        # print('--------UPDATE-------')
+        # print(ticks)
+        # handle_input()
+        # try:
+        #     done, reward = update(score, ticks, action)
+        # except:
+        if num_updates == 0:
+            done, reward = update(score, ticks, action)
+        else: 
+            done, reward = update(score, ticks, [False, False, False, False, False])
+        update_ticks -= TICKS_PER_UPDATE
+        num_updates += 1
+        ticks += TICKS_PER_UPDATE
+
+    render_interval = update_ticks / TICKS_PER_UPDATE
+    render(screen, render_interval, score)
+    rgb_array = pygame.surfarray.array3d(screen)
+
+    clock.tick(60)
+
+    new_state = np.asarray(rgb_array, dtype=np.uint8)
+
+    return new_state, reward, done, {}
 
 
 if __name__ == "__main__":
@@ -350,7 +389,6 @@ if __name__ == "__main__":
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
     imgs = load_imgs()
 
     song, notes = load_chart(args.chart_file, imgs)
@@ -375,35 +413,38 @@ if __name__ == "__main__":
     audio_name = '../charts/' + song.name
     print("You are playing {}.".format(audio_name))
     song_audio = mixer.Sound(audio_name)
-    song_audio.set_volume(0.3)
+    song_audio.set_volume(0.1)
     song_audio.play()
 
     ticks = 0
     update_ticks = 0
     start_ms = pygame.time.get_ticks()
-
+    done = False
     print("The Game is Running now!")
 
+    total_reward = 0
     while game_is_running:
         start_time = time.time()
 
-        update(score, ticks)
+        action = handle_input()
+        # print("Entering Step")
+        reward, new_state, done, _ = step(action)
+        
+        if type(reward) == int:
+            print(reward, done)
+            total_reward += reward
+        # print("Leaving Step")
 
-        handle_inputs()
-
-        render_interval = update_ticks / TICKS_PER_UPDATE
-        render(screen, render_interval, score)
-
-        clock.tick(60)
         # print(clock.get_time())
         # print(clock.get_rawtime())
         # print(clock.get_fps())
         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
-
+    print(total_reward)
     print("Pontuação Final: {} pontos!".format(score.value))
 
     song_audio.stop()
     mixer.quit()
 
     pygame.quit()
+sys.exit()
