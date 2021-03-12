@@ -1,5 +1,6 @@
 import argparse
 import re
+import sys
 import time
 from os import path
 
@@ -15,7 +16,7 @@ FRET_HEIGHT = 256
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 720
 # TODO: com TICKS_PER_UPDATE = 1 ta quebrando
-TICKS_PER_UPDATE = 5
+TICKS_PER_UPDATE = 3
 MS_PER_MIN = 60000
 
 # TODO: qdo aumenta mto, da errado (ex 500)
@@ -262,7 +263,7 @@ def render(screen, render_interval, score):
     # draw score
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
 
-    # draw_rock_meter(score, screen, x_pos=score.x_pos, y_pos=600)
+    # draw_rock_meter(score, screen, x_pos=SCREEN_WIDTH-100, y_pos=600)
 
     draw_score_multiplier(score, screen, x_pos=100, y_pos=600)
 
@@ -277,7 +278,7 @@ recent_note_history = []
 
 def update(score, ticks, action):
     global game_is_running, recent_note_history
-
+    reward = None
     # Poorly updates song BPM and TS values
     if ticks in song.bpm_dict:
         song.bpm = song.bpm_dict[ticks]
@@ -309,7 +310,7 @@ def update(score, ticks, action):
         if not note in Buttons_hit_list:
 
             score.miss()
-
+            reward = -1
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
@@ -325,9 +326,11 @@ def update(score, ticks, action):
                 recent_note_history.remove(notes_in_hit_zone[0])
 
                 score.hit()
+                reward = 1
             else:
                 # key was pressed but without any note
                 score.miss_click()
+                reward = -1
 
     # Move notes down
     all_notes_list.update(ticks)
@@ -337,11 +340,12 @@ def update(score, ticks, action):
     if len(all_notes_list) == 0:
         game_is_running = False
         done = True
-    return done
+    return done, reward
 
 
 def step(action):
     global start_ms, update_ticks, done, ticks
+    reward = None
     current_ms = pygame.time.get_ticks()
     delta_ms = current_ms - start_ms
     #delta_ms = clock.get_time()
@@ -356,8 +360,14 @@ def step(action):
     while (TICKS_PER_UPDATE <= update_ticks):
         # print('--------UPDATE-------')
         # print(ticks)
-        # handle_inputs()
-        done = update(score, ticks, action)
+        # handle_input()
+        # try:
+        #     done, reward = update(score, ticks, action)
+        # except:
+        if num_updates == 0:
+            done, reward = update(score, ticks, action)
+        else: 
+            done, reward = update(score, ticks, [False, False, False, False, False])
         update_ticks -= TICKS_PER_UPDATE
         num_updates += 1
         ticks += TICKS_PER_UPDATE
@@ -368,10 +378,9 @@ def step(action):
 
     clock.tick(60)
 
-    reward = 0
     new_state = np.asarray(rgb_array, dtype=np.uint8)
 
-    return reward, new_state, done
+    return new_state, reward, done, {}
 
 
 if __name__ == "__main__":
@@ -413,12 +422,17 @@ if __name__ == "__main__":
     done = False
     print("The Game is Running now!")
 
+    total_reward = 0
     while game_is_running:
         start_time = time.time()
 
         action = handle_input()
         # print("Entering Step")
-        step(action)
+        reward, new_state, done, _ = step(action)
+        
+        if type(reward) == int:
+            print(reward, done)
+            total_reward += reward
         # print("Leaving Step")
 
         # print(clock.get_time())
@@ -426,10 +440,11 @@ if __name__ == "__main__":
         # print(clock.get_fps())
         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
-
+    print(total_reward)
     print("Pontuação Final: {} pontos!".format(score.value))
 
     song_audio.stop()
     mixer.quit()
 
     pygame.quit()
+sys.exit()
