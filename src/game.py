@@ -239,7 +239,7 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 handle_input = Action()
 
 
-def render(screen, render_interval, score):
+def render(screen, score, render_interval=None):
     # Draw Phase
     screen.fill((0, 0, 0))
 
@@ -269,7 +269,7 @@ def render(screen, render_interval, score):
 
     pygame.display.flip()
 
-    return
+    return screen
 
 
 recent_note_history = []
@@ -277,8 +277,10 @@ recent_note_history = []
 
 
 def update(score, ticks, action):
-    global game_is_running, recent_note_history
-    reward = None
+    global recent_note_history
+    reward = 0.0
+    done = False
+
     # Poorly updates song BPM and TS values
     if ticks in song.bpm_dict:
         song.bpm = song.bpm_dict[ticks]
@@ -309,7 +311,7 @@ def update(score, ticks, action):
     for note in recent_note_history:
         if not note in Buttons_hit_list:
 
-            score.miss()
+            done = score.miss()
             reward = -1
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
@@ -329,58 +331,34 @@ def update(score, ticks, action):
                 reward = 1
             else:
                 # key was pressed but without any note
-                score.miss_click()
+                done = score.miss_click()
                 reward = -1
 
     # Move notes down
-    all_notes_list.update(ticks)
+    all_notes_list.update()
 
     # If there are no more notes, end the game
-    done = False
     if len(all_notes_list) == 0:
-        game_is_running = False
         done = True
-    return done, reward
-
-
-def step(action):
-    global start_ms, update_ticks, done, ticks
-    reward = None
-    current_ms = pygame.time.get_ticks()
-    delta_ms = current_ms - start_ms
-    #delta_ms = clock.get_time()
-    start_ms = current_ms
-    # TODO: o jogo deve rodar baseado nos ticks e nao nos milissegundos
-    #print("res:", song.resolution, "bpm: ", song.bpm, "ms/min:", MS_PER_MIN, "ts:",  song.ts)
-    tick_per_ms = song.resolution * song.bpm / MS_PER_MIN
-    delta_ticks = tick_per_ms * delta_ms
-    update_ticks += delta_ticks
-    num_updates = 0
-
-    while (TICKS_PER_UPDATE <= update_ticks):
-        # print('--------UPDATE-------')
-        # print(ticks)
-        # handle_input()
-        # try:
-        #     done, reward = update(score, ticks, action)
-        # except:
-        if num_updates == 0:
-            done, reward = update(score, ticks, action)
-        else: 
-            done, reward = update(score, ticks, [False, False, False, False, False])
-        update_ticks -= TICKS_PER_UPDATE
-        num_updates += 1
-        ticks += TICKS_PER_UPDATE
-
-    render_interval = update_ticks / TICKS_PER_UPDATE
-    render(screen, render_interval, score)
-    rgb_array = pygame.surfarray.array3d(screen)
 
     clock.tick(60)
 
-    new_state = np.asarray(rgb_array, dtype=np.uint8)
+    return done, reward
 
-    return new_state, reward, done, {}
+
+def _get_obs():
+    render(screen, score)
+    rgb_array = pygame.surfarray.array3d(screen)
+    obs = np.asarray(rgb_array, dtype=np.uint8)
+    return obs
+
+
+def step(action):
+    global done
+    reward = 0
+    done, reward = update(score, ticks, action)
+    observation = _get_obs()
+    return observation, reward, done, {}
 
 
 if __name__ == "__main__":
@@ -406,45 +384,44 @@ if __name__ == "__main__":
 
     # Game Loop
     score = Score(decrease_mode=args.decrease_score)
-    game_is_running = True
     clock = pygame.time.Clock()
 
-    mixer.init()
-    audio_name = '../charts/' + song.name
-    print("You are playing {}.".format(audio_name))
-    song_audio = mixer.Sound(audio_name)
-    song_audio.set_volume(0.1)
-    song_audio.play()
+    # Audio won't be used now
+    # mixer.init()
+    # audio_name = '../charts/' + song.name
+    # print("You are playing {}.".format(audio_name))
+    # song_audio = mixer.Sound(audio_name)
+    # song_audio.set_volume(0.1)
+    # song_audio.play()
 
     ticks = 0
-    update_ticks = 0
-    start_ms = pygame.time.get_ticks()
     done = False
+    total_reward = 0
+    game_is_running = True
+    action = [False, False, False, False, False]
     print("The Game is Running now!")
 
-    total_reward = 0
     while game_is_running:
-        start_time = time.time()
+        # start_time = time.time()
 
-        action = handle_input()
-        # print("Entering Step")
         reward, new_state, done, _ = step(action)
-        
+
         if type(reward) == int:
             print(reward, done)
             total_reward += reward
-        # print("Leaving Step")
 
         # print(clock.get_time())
         # print(clock.get_rawtime())
         # print(clock.get_fps())
         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
-    print(total_reward)
+        if done:
+            game_is_running = False
     print("Pontuação Final: {} pontos!".format(score.value))
+    print("Recompensa total do agente: {}.".format(total_reward))
 
-    song_audio.stop()
-    mixer.quit()
+    # song_audio.stop()
+    # mixer.quit()
 
     pygame.quit()
 sys.exit()

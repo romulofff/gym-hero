@@ -18,14 +18,18 @@ class Score():
 
     def miss(self):
         self._counter = 0
-
         self.rock_meter -= 2
         if self.rock_meter <= 0:
-            raise NotImplementedError("Game lost, rock meater -> 0")
+            global done
+            done = True
+        else:
+            done = False
+        return done
 
     def miss_click(self):
-        self.miss()
+        done = self.miss()
         self.value -= 10 * self.decrease_mode
+        return done
 
     @property
     def counter(self):
