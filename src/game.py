@@ -353,13 +353,13 @@ def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
     return obs
 
 
-def step(action):
-    global done
-    reward = 0
-    done, reward = update(score, ticks, action, song,
-                          visible_notes_list, all_notes_list, Buttons, clock)
-    observation = get_obs(screen, score, buttons_sprites_list, visible_notes_list)
-    return observation, reward, done, {}
+# def _step(action):
+#     global done
+#     reward = 0
+#     done, reward = update(score, ticks, action, song,
+#                           visible_notes_list, all_notes_list, Buttons, clock)
+#     observation = get_obs(screen, score, buttons_sprites_list, visible_notes_list)
+#     return observation, reward, done, {}
 
 
 # if __name__ == "__main__":

@@ -8,7 +8,7 @@ from game import *
 class GHEnv(gym.Env):
 
     def __init__(self):
-        self.action_space = gym.spaces.Discrete(5)
+        self.action_space = gym.spaces.MultiBinary(5)
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(
             SCREEN_WIDTH, SCREEN_HEIGHT, 3), dtype=np.uint8)
         self.done = False
@@ -87,9 +87,8 @@ if __name__ == '__main__':
     done = False
     total_reward = 0.0
     while not done:
-        # action = env.action_space.sample()
-        action = [False, False, False, False, False]
-        # print(action)
+        action = env.action_space.sample()
+        print(action)
         state, reward, done, info = env.step(action)
         # print(reward, done, info)
 
