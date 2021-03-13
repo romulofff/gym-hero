@@ -239,7 +239,7 @@ def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
 handle_input = Action()
 
 
-def render(screen, score, render_interval=None):
+def render(screen, score, buttons_sprites_list, visible_notes_list):
     # Draw Phase
     screen.fill((0, 0, 0))
 
@@ -276,7 +276,7 @@ recent_note_history = []
 # TODO: separar handle input do update
 
 
-def update(score, ticks, action):
+def update(score, ticks, action, song, visible_notes_list, all_notes_list, Buttons, clock):
     global recent_note_history
     reward = 0.0
     done = False
@@ -346,8 +346,8 @@ def update(score, ticks, action):
     return done, reward
 
 
-def _get_obs():
-    render(screen, score)
+def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
+    render(screen, score, buttons_sprites_list, visible_notes_list)
     rgb_array = pygame.surfarray.array3d(screen)
     obs = np.asarray(rgb_array, dtype=np.uint8)
     return obs
@@ -356,72 +356,73 @@ def _get_obs():
 def step(action):
     global done
     reward = 0
-    done, reward = update(score, ticks, action)
-    observation = _get_obs()
+    done, reward = update(score, ticks, action, song,
+                          visible_notes_list, all_notes_list, Buttons, clock)
+    observation = get_obs(screen, score, buttons_sprites_list, visible_notes_list)
     return observation, reward, done, {}
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    args = arg_parser()
+#     args = arg_parser()
 
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    imgs = load_imgs()
+#     pygame.init()
+#     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+#     imgs = load_imgs()
 
-    song, notes = load_chart(args.chart_file, imgs)
+#     song, notes = load_chart(args.chart_file, imgs)
 
-    all_notes_list = pygame.sprite.Group()
-    buttons_sprites_list = pygame.sprite.Group()
-    visible_notes_list = pygame.sprite.Group()
+#     all_notes_list = pygame.sprite.Group()
+#     buttons_sprites_list = pygame.sprite.Group()
+#     visible_notes_list = pygame.sprite.Group()
 
-    Buttons = create_button_list(
-        imgs, buttons_sprites_list)
+#     Buttons = create_button_list(
+#         imgs, buttons_sprites_list)
 
-    for note in notes:
-        all_notes_list.add(note)
-        # buttons_sprites_list.add(note)
+#     for note in notes:
+#         all_notes_list.add(note)
+#         # buttons_sprites_list.add(note)
 
-    # Game Loop
-    score = Score(decrease_mode=args.decrease_score)
-    clock = pygame.time.Clock()
+#     # Game Loop
+#     score = Score(decrease_mode=args.decrease_score)
+#     clock = pygame.time.Clock()
 
-    # Audio won't be used now
-    # mixer.init()
-    # audio_name = '../charts/' + song.name
-    # print("You are playing {}.".format(audio_name))
-    # song_audio = mixer.Sound(audio_name)
-    # song_audio.set_volume(0.1)
-    # song_audio.play()
+#     # Audio won't be used now
+#     # mixer.init()
+#     # audio_name = '../charts/' + song.name
+#     # print("You are playing {}.".format(audio_name))
+#     # song_audio = mixer.Sound(audio_name)
+#     # song_audio.set_volume(0.1)
+#     # song_audio.play()
 
-    ticks = 0
-    done = False
-    total_reward = 0
-    game_is_running = True
-    action = [False, False, False, False, False]
-    print("The Game is Running now!")
+#     ticks = 0
+#     done = False
+#     total_reward = 0
+#     game_is_running = True
+#     action = [False, False, False, False, False]
+#     print("The Game is Running now!")
 
-    while game_is_running:
-        # start_time = time.time()
+#     while game_is_running:
+#         # start_time = time.time()
 
-        reward, new_state, done, _ = step(action)
+#         reward, new_state, done, _ = step(action)
 
-        if type(reward) == int:
-            print(reward, done)
-            total_reward += reward
+#         if type(reward) == int:
+#             print(reward, done)
+#             total_reward += reward
 
-        # print(clock.get_time())
-        # print(clock.get_rawtime())
-        # print(clock.get_fps())
-        # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
-        # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
-        if done:
-            game_is_running = False
-    print("Pontuação Final: {} pontos!".format(score.value))
-    print("Recompensa total do agente: {}.".format(total_reward))
+#         # print(clock.get_time())
+#         # print(clock.get_rawtime())
+#         # print(clock.get_fps())
+#         # print('Game Speed: {}'.format((num_updates) / (time.time() - start_time)))
+#         # print('Render FPS: {}'.format(1.0 / (time.time() - start_time)))
+#         if done:
+#             game_is_running = False
+#     print("Pontuação Final: {} pontos!".format(score.value))
+#     print("Recompensa total do agente: {}.".format(total_reward))
 
-    # song_audio.stop()
-    # mixer.quit()
+#     # song_audio.stop()
+#     # mixer.quit()
 
-    pygame.quit()
-sys.exit()
+#     pygame.quit()
+# sys.exit()
