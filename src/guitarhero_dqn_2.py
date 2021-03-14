@@ -1,6 +1,6 @@
 import itertools as it
-from random import sample, randint, random
-from time import time, sleep
+from random import randint, random, sample
+from time import sleep, time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -55,14 +55,9 @@ EPSILON = 0.1
 def choose_action(state, episode):
     if random() < EPSILON:
         return randint(0, len(actions) - 1)
-        # return env.action_space.sample()
-
-    
 
     state = np.array(state)
-    # state = np.stack([state, state, state, state], axis=2)
     state = state[np.newaxis, ...]
-    # state = preprocess(state)
     q_values = model.predict(state)
 
     return np.argmax(q_values[0])
@@ -133,35 +128,17 @@ for episode in range(NUM_EPISODES):
     # print('episode: {}\n'.format(episode))
     for _ in trange(NUM_STEPS):
         start_time = time()
-        # env.render()
         old_state = preprocess(observation)
         action = choose_action(old_state, episode)
-        # print("ACTION",action)
-        # print("ACTIONS",actions[action])
         observation, reward, done, info = env.step(actions[action])
-        # print(reward)
         current_reward += reward
-        # if (reward != 0):
-        #print('current_r: ' + str(current_reward))
-        # if done:
-        # print(int(done))
-        # print("####DONE", done)
         new_state = preprocess(observation) if not done else None
-        # print("NEW STATE", new_state)
-        replayMemory.add_transition(old_state, action, new_state, int(done), reward)
+        replayMemory.add_transition(
+            old_state, action, new_state, int(done), reward)
 
         if replayMemory.size > BATCH_SIZE:
             s1, a, s2, terminal, r = replayMemory.get_sample(BATCH_SIZE)
-            # print(s1,s2)
-            # s1 = np.stack([s1, s1, s1, s1], axis=3)
-            # s2 = np.stack([s2, s2, s2, s2], axis=3)
-            # if terminal:
-                # q2 = 1
-            # else:
-            # print("S2",s2)
             q2 = np.max(model.predict(s2), axis=1)
-            # from vizdoom learning tensorflow
-            # print(s1.shape)
             target_q = model.predict(s1)
 
             new_value = reward + discount_factor * q2 * (1 - terminal)
