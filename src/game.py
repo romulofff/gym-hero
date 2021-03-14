@@ -348,8 +348,7 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
 
 def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
     render(screen, score, buttons_sprites_list, visible_notes_list)
-    rgb_array = pygame.surfarray.array3d(screen)
-    obs = np.asarray(rgb_array, dtype=np.uint8)
+    obs = pygame.surfarray.array3d(screen).swapaxes(1,0)
     return obs
 
 

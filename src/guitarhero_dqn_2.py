@@ -1,3 +1,4 @@
+import os
 import itertools as it
 from random import randint, random, sample
 from time import sleep, time
@@ -8,6 +9,7 @@ import tensorflow as tf
 import tensorflow.keras as keras
 from numpy.core.fromnumeric import reshape
 from skimage import color
+from skimage.io import imsave
 from skimage.transform import resize
 from skimage.util import crop
 from tensorflow.keras import layers
@@ -23,14 +25,12 @@ dropout_prob = 0.3
 def preprocess(image):  # color 210 x 160
     preproc_img = color.rgb2gray(image)  # gray 210 x 160
     preproc_img = resize(preproc_img, output_shape=(
-        108, 96), anti_aliasing=False)  # 110 x 84
-    # I tested and a (13, 13) crop would remove the pad, which is crucial to play the game
-    # preproc_img = crop(preproc_img, ((17, 9), (0, 0)))  # 84 x 84
+        96, 108), anti_aliasing=False)  # 110 x 84
     return preproc_img
 
 
 def create_network(available_actions_count):
-    inputs = keras.Input(shape=(IMG_HEIGHT, IMG_WIDTH, 1), name='frame')
+    inputs = keras.Input(shape=(IMG_WIDTH, IMG_HEIGHT, 1), name='frame')
     x = layers.Conv2D(filters=32, kernel_size=(4, 4), strides=(2, 2), padding='same',
                       kernel_initializer='glorot_normal', bias_initializer=tf.constant_initializer(0.1), activation='relu')(inputs)
     x = layers.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2), padding='same',
@@ -57,7 +57,7 @@ def choose_action(state, episode):
         return randint(0, len(actions) - 1)
 
     state = np.array(state)
-    state = state[np.newaxis, ...]
+    state = state[np.newaxis, ...]    
     q_values = model.predict(state)
 
     return np.argmax(q_values[0])
@@ -71,7 +71,7 @@ IMG_CHANNELS = 1
 class ReplayMemory:
     def __init__(self, capacity):
         channels = 1
-        state_shape = (capacity, IMG_HEIGHT, IMG_WIDTH, channels)
+        state_shape = (capacity, IMG_WIDTH, IMG_HEIGHT, channels)
         self.s1 = np.zeros(state_shape, dtype=np.float32)
         self.s2 = np.zeros(state_shape, dtype=np.float32)
         self.a = np.zeros(capacity, dtype=np.int32)
@@ -95,7 +95,6 @@ class ReplayMemory:
 
     def get_sample(self, sample_size):
         i = sample(range(0, self.size), sample_size)
-        # print("S2",self.s2)
         return self.s1[i], self.a[i], self.s2[i], self.isterminal[i], self.r[i]
 
 
