@@ -30,7 +30,7 @@ def preprocess(image):  # color 210 x 160
 
 
 def create_network(available_actions_count):
-    inputs = keras.Input(shape=(IMG_HEIGHT, IMG_WIDTH, 4), name='frame')
+    inputs = keras.Input(shape=(IMG_HEIGHT, IMG_WIDTH, 1), name='frame')
     x = layers.Conv2D(filters=32, kernel_size=(4, 4), strides=(2, 2), padding='same',
                       kernel_initializer='glorot_normal', bias_initializer=tf.constant_initializer(0.1), activation='relu')(inputs)
     x = layers.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2), padding='same',
@@ -60,9 +60,9 @@ def choose_action(state, episode):
     
 
     state = np.array(state)
-    state = np.stack([state, state, state, state], axis=2)
+    # state = np.stack([state, state, state, state], axis=2)
     state = state[np.newaxis, ...]
-
+    # state = preprocess(state)
     q_values = model.predict(state)
 
     return np.argmax(q_values[0])
@@ -100,6 +100,7 @@ class ReplayMemory:
 
     def get_sample(self, sample_size):
         i = sample(range(0, self.size), sample_size)
+        # print("S2",self.s2)
         return self.s1[i], self.a[i], self.s2[i], self.isterminal[i], self.r[i]
 
 
@@ -129,7 +130,7 @@ model = create_network(len(actions))
 model.summary()
 
 for episode in range(NUM_EPISODES):
-    print('episode: {}\n'.format(episode))
+    # print('episode: {}\n'.format(episode))
     for _ in trange(NUM_STEPS):
         start_time = time()
         # env.render()
@@ -146,18 +147,18 @@ for episode in range(NUM_EPISODES):
         # print(int(done))
         # print("####DONE", done)
         new_state = preprocess(observation) if not done else None
-
+        # print("NEW STATE", new_state)
         replayMemory.add_transition(old_state, action, new_state, int(done), reward)
 
         if replayMemory.size > BATCH_SIZE:
-            s1, a, r, terminal, s2 = replayMemory.get_sample(BATCH_SIZE)
-            # print(terminal)
+            s1, a, s2, terminal, r = replayMemory.get_sample(BATCH_SIZE)
+            # print(s1,s2)
             # s1 = np.stack([s1, s1, s1, s1], axis=3)
             # s2 = np.stack([s2, s2, s2, s2], axis=3)
             # if terminal:
                 # q2 = 1
             # else:
-            print("S2",s2)
+            # print("S2",s2)
             q2 = np.max(model.predict(s2), axis=1)
             # from vizdoom learning tensorflow
             # print(s1.shape)
