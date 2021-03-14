@@ -32,7 +32,12 @@ class GHEnv(gym.Env):
         """
 
         reward = 0
-        self.done, reward = update(self.score, 0, action, self.song,
+        if not isinstance(action, np.ndarray):
+            action_vec = [False, False, False, False, False]
+            action_vec[action] = True
+        else:
+            action_vec = action
+        self.done, reward = update(self.score, 0, action_vec, self.song,
                                    self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock)
         observation = get_obs(self.screen, self.score,
                               self.buttons_sprites_list, self.visible_notes_list)
@@ -54,7 +59,7 @@ class GHEnv(gym.Env):
 
         self.done = False
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         imgs = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)
