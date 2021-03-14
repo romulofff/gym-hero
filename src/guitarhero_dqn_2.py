@@ -21,6 +21,18 @@ import gh_env
 
 dropout_prob = 0.3
 
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
+
 
 def preprocess(image):  # color 210 x 160
     preproc_img = color.rgb2gray(image)  # gray 210 x 160
@@ -57,7 +69,7 @@ def choose_action(state, episode):
         return randint(0, len(actions) - 1)
 
     state = np.array(state)
-    state = state[np.newaxis, ...]    
+    state = state[np.newaxis, ...]
     q_values = model.predict(state)
 
     return np.argmax(q_values[0])
@@ -99,10 +111,10 @@ class ReplayMemory:
 
 
 REPLAY_CAPACITY = 1000  # 1E6
-NUM_STEPS = 1000  # 10E6
+NUM_STEPS = 10000  # 10E6
 NUM_EPISODES = 100
 
-BATCH_SIZE = 32
+BATCH_SIZE = 2
 
 discount_factor = 0.99
 
@@ -116,7 +128,7 @@ observation = env.reset()
 mean_r_per_episode = []
 rewards = []
 current_reward = 0.0
-num_actions = 5
+num_actions = 3
 
 
 actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
@@ -140,10 +152,12 @@ for episode in range(NUM_EPISODES):
             q2 = np.max(model.predict(s2), axis=1)
             target_q = model.predict(s1)
 
-            new_value = reward + discount_factor * q2 * (1 - terminal)
-            target_q = new_value
-
+            # new_value = reward + discount_factor * q2 * (1 - terminal)
+            target_q[np.arange(target_q.shape[0]), a] = reward + \
+                discount_factor * q2 * (1 - terminal)
+            # target_q = new_value
             #model.fit(x=s1, y=target_q, epochs=1, batch_size=BATCH_SIZE, verbose=0, steps_per_epoch=1)
+            print(target_q.shape, target_q)
             model.train_on_batch(x=s1, y=target_q)
 
         if done:
@@ -156,6 +170,10 @@ for episode in range(NUM_EPISODES):
     mean_r_per_episode.append(np.mean(rewards))
     print('mean r: ' + str(np.mean(rewards)))
     rewards = []
+
+    if episode % 5 == 0:
+        model.save(os.path.join("..", "agents",
+                                "agente_ep_{}_{}".format(episode, time())))
 
 env.close()
 
