@@ -32,11 +32,15 @@ class GHEnv(gym.Env):
         """
 
         reward = 0
-        if not isinstance(action, np.ndarray):
-            action_vec = [False, False, False, False, False]
-            action_vec[action] = True
-        else:
+        # print("\n", action)
+        if isinstance(action, list):
             action_vec = action
+        elif isinstance(action, np.ndarray):
+            action_vec = action
+        else:
+            action_vec = [False, False, False, False, False]
+            action_vec[action] = True        
+        # print(action_vec)
         self.done, reward = update(self.score, 0, action_vec, self.song,
                                    self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock)
         observation = get_obs(self.screen, self.score,
