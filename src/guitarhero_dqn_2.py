@@ -36,6 +36,7 @@ if gpus:
 
 def preprocess(image):  # color 210 x 160
     preproc_img = color.rgb2gray(image)  # gray 210 x 160
+    preproc_img = crop(preproc_img, ((75),(0)))
     preproc_img = resize(preproc_img, output_shape=(
         96, 108), anti_aliasing=False)  # 110 x 84
     return preproc_img
@@ -128,7 +129,7 @@ observation = env.reset()
 mean_r_per_episode = []
 rewards = []
 current_reward = 0.0
-num_actions = 3
+num_actions = 4 # Muda de acordo com a dificuldade
 
 
 actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
@@ -155,9 +156,6 @@ for episode in range(NUM_EPISODES):
             # new_value = reward + discount_factor * q2 * (1 - terminal)
             target_q[np.arange(target_q.shape[0]), a] = reward + \
                 discount_factor * q2 * (1 - terminal)
-            # target_q = new_value
-            #model.fit(x=s1, y=target_q, epochs=1, batch_size=BATCH_SIZE, verbose=0, steps_per_epoch=1)
-            print(target_q.shape, target_q)
             model.train_on_batch(x=s1, y=target_q)
 
         if done:
