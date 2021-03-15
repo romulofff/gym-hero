@@ -9,13 +9,14 @@ class GHEnv(gym.Env):
 
     def __init__(self):
         self.difficulty_dict = {
-            "Easy":3,
-            "Medium":4,
-            "Hard":5,
-            "Expert":5
+            "Easy": 3,
+            "Medium": 4,
+            "Hard": 5,
+            "Expert": 5
         }
         self.args = arg_parser()
-        self.action_space = gym.spaces.MultiBinary(self.difficulty_dict[self.args.difficulty])
+        self.action_space = gym.spaces.MultiBinary(
+            self.difficulty_dict[self.args.difficulty])
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(
             SCREEN_WIDTH, SCREEN_HEIGHT, 3), dtype=np.uint8)
         self.done = False
@@ -45,7 +46,7 @@ class GHEnv(gym.Env):
             action_vec = action
         else:
             action_vec = [False, False, False, False, False]
-            action_vec[action] = True        
+            action_vec[action] = True
         # print(action_vec)
         self.done, reward = update(self.score, 0, action_vec, self.song,
                                    self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock)
@@ -66,12 +67,12 @@ class GHEnv(gym.Env):
         Returns:
             observation (object): the initial observation.
         """
-        
+
         self.done = False
         pygame.init()
         # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        imgs = load_imgs()
+        imgs, img_button = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)
 
@@ -80,7 +81,7 @@ class GHEnv(gym.Env):
         self.visible_notes_list = pygame.sprite.Group()
 
         self.Buttons = create_button_list(
-            imgs, self.buttons_sprites_list, difficulty=self.difficulty_dict[self.args.difficulty])
+            img_button, self.buttons_sprites_list, difficulty=self.difficulty_dict[self.args.difficulty])
 
         for note in notes:
             self.all_notes_list.add(note)
@@ -99,7 +100,7 @@ if __name__ == '__main__':
     start_time = time.time()
     env = GHEnv()
     env.reset()
-    
+
     done = False
     total_reward = 0.0
     while not done:
