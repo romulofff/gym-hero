@@ -8,11 +8,17 @@ from game import *
 class GHEnv(gym.Env):
 
     def __init__(self):
-        self.action_space = gym.spaces.MultiBinary(5)
+        self.difficulty_dict = {
+            "Easy":3,
+            "Medium":4,
+            "Hard":5,
+            "Expert":5
+        }
+        self.args = arg_parser()
+        self.action_space = gym.spaces.MultiBinary(self.difficulty_dict[self.args.difficulty])
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(
             SCREEN_WIDTH, SCREEN_HEIGHT, 3), dtype=np.uint8)
         self.done = False
-        self.args = arg_parser()
 
     def step(self, action):
         """Run one timestep of the environment's dynamics. When end of
@@ -60,10 +66,11 @@ class GHEnv(gym.Env):
         Returns:
             observation (object): the initial observation.
         """
-
+        
         self.done = False
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
+        # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         imgs = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)
@@ -73,7 +80,7 @@ class GHEnv(gym.Env):
         self.visible_notes_list = pygame.sprite.Group()
 
         self.Buttons = create_button_list(
-            imgs, self.buttons_sprites_list)
+            imgs, self.buttons_sprites_list, difficulty=self.difficulty_dict[self.args.difficulty])
 
         for note in notes:
             self.all_notes_list.add(note)
