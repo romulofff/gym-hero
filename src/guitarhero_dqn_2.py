@@ -36,7 +36,7 @@ if gpus:
 
 def preprocess(image):  # color 210 x 160
     preproc_img = color.rgb2gray(image)  # gray 210 x 160
-    preproc_img = crop(preproc_img, ((75),(0)))
+    preproc_img = crop(preproc_img, ((75), (0)))
     preproc_img = resize(preproc_img, output_shape=(
         96, 108), anti_aliasing=False)  # 110 x 84
     return preproc_img
@@ -129,7 +129,7 @@ observation = env.reset()
 mean_r_per_episode = []
 rewards = []
 current_reward = 0.0
-num_actions = env.action_space.n # Muda de acordo com a dificuldade
+num_actions = env.action_space.n  # Muda de acordo com a dificuldade
 
 
 actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
