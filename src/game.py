@@ -13,7 +13,7 @@ from score import Score
 from utils import draw_rock_meter, draw_score, draw_score_multiplier
 
 FRET_HEIGHT = 256
-SCREEN_WIDTH = 640
+SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 720
 # TODO: com TICKS_PER_UPDATE = 1 ta quebrando
 TICKS_PER_UPDATE = 3
@@ -71,7 +71,7 @@ class Note(pygame.sprite.Sprite):
 
     def update(self, to_kill=None):
         self.rect.y = int(self.y_pos) + (SCREEN_HEIGHT-90)
-        self.y_pos += 12
+        self.y_pos += 30
 
         if self.rect.y > SCREEN_HEIGHT + 60 or to_kill == True:
             self.kill()
@@ -99,6 +99,8 @@ def arg_parser():
                         help='enables the feature of decreasing the score for mistakes.')
     parser.add_argument('--human', action='store_true',
                         help='enables human controls through keyboard.')
+    parser.add_argument(
+        '--difficulty', help='choose game difficulty (Easy, Medium, Hard, Expert)')
     return parser.parse_args()
 
 
@@ -119,10 +121,10 @@ def load_imgs():
     return imgs
 
 
-def create_button_list(imgs, buttons_sprites_list):
+def create_button_list(imgs, buttons_sprites_list, difficulty=5):
     buttons = []
 
-    for i in range(5):
+    for i in range(difficulty):
         button = create_button(imgs[i], color_x_pos[i])
         buttons.append(button)
         buttons_sprites_list.add(button)
@@ -139,14 +141,18 @@ def create_button(img, x_pos):
     return button
 
 
-def load_chart(filename, imgs):
-
+def load_chart(filename, imgs, difficulty=None):
     f = open(filename, 'r')
     chart_data = f.read().replace('  ', '')
     f.close()
 
     song = load_song_info(chart_data)
-    notes = load_notes(chart_data, song, imgs)
+    if difficulty:
+        notes = load_notes(chart_data, song, imgs, difficulty)
+    else:
+        notes = load_notes(chart_data, song, imgs)
+
+
 
     return song, notes
 
@@ -203,9 +209,9 @@ def load_resolutions(chart_data, song):
     song.ts = song.ts_dict[0]
 
 
-def load_notes(chart_data, song, imgs, difficulty='ExpertSingle'):
+def load_notes(chart_data, song, imgs, difficulty='EasySingle'):
 
-    search_string = "[" + difficulty + "]\n{\n"
+    search_string = "[" + difficulty+"Single" + "]\n{\n"
     inf = chart_data.find(search_string)
     sup = chart_data[inf:].find('}')
     sup += inf
@@ -263,7 +269,7 @@ def render(screen, score, buttons_sprites_list, visible_notes_list):
     # draw score
     draw_score(screen, str(score.value), score.font_size, score.x_pos)
 
-    draw_rock_meter(score, screen, x_pos=SCREEN_WIDTH-100, y_pos=600)
+    draw_rock_meter(score, screen, x_pos=75, y_pos=500)
 
     draw_score_multiplier(score, screen, x_pos=100, y_pos=600)
 
@@ -322,6 +328,7 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
     for n, notes_in_hit_zone in enumerate(Buttons_hit_list_by_color):
         # Eg: event.key == pygame.K_a
         # if event.key == getattr(pygame, f"K_{keys[n]}"):
+        print(n)
         if action[n]:
             if len(notes_in_hit_zone) > 0:
                 notes_in_hit_zone[0].update(True)
@@ -348,11 +355,11 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
 
 def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
     render(screen, score, buttons_sprites_list, visible_notes_list)
-    obs = pygame.surfarray.array3d(screen).swapaxes(1,0)
+    obs = pygame.surfarray.array3d(screen).swapaxes(1, 0)
     return obs
 
 
-# def _step(action):
+# def step(action):
 #     global done
 #     reward = 0
 #     done, reward = update(score, ticks, action, song,
@@ -363,20 +370,27 @@ def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
 
 # if __name__ == "__main__":
 
+#     difficulty_dict = {
+#         "Easy":3,
+#         "Medium":4,
+#         "Hard":5,
+#         "Expert":5
+#     }
+
 #     args = arg_parser()
 
 #     pygame.init()
 #     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 #     imgs = load_imgs()
 
-#     song, notes = load_chart(args.chart_file, imgs)
+#     song, notes = load_chart(args.chart_file, imgs, args.difficulty)
 
 #     all_notes_list = pygame.sprite.Group()
 #     buttons_sprites_list = pygame.sprite.Group()
 #     visible_notes_list = pygame.sprite.Group()
 
 #     Buttons = create_button_list(
-#         imgs, buttons_sprites_list)
+#         imgs, buttons_sprites_list, difficulty_dict[args.difficulty])
 
 #     for note in notes:
 #         all_notes_list.add(note)
@@ -404,11 +418,9 @@ def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
 #     while game_is_running:
 #         # start_time = time.time()
 
-#         reward, new_state, done, _ = step(action)
+#         new_state, reward, done, _ = step(action)
 
-#         if type(reward) == int:
-#             print(reward, done)
-#             total_reward += reward
+#         total_reward += reward
 
 #         # print(clock.get_time())
 #         # print(clock.get_rawtime())
