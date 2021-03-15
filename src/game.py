@@ -177,7 +177,7 @@ def load_song_info(chart_data):
         info = line.split()
 
         if (info[0] == 'Offset'):
-            song.offset = int(info[2]) + 600
+            song.offset = int(info[2]) + 0
 
         if (info[0] == 'Resolution'):
             song.resolution = int(info[2])
