@@ -129,7 +129,7 @@ observation = env.reset()
 mean_r_per_episode = []
 rewards = []
 current_reward = 0.0
-num_actions = 4 # Muda de acordo com a dificuldade
+num_actions = env.action_space.n # Muda de acordo com a dificuldade
 
 
 actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
