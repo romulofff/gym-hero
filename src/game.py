@@ -106,19 +106,25 @@ def arg_parser():
 
 def load_imgs():
     imgs = []
-
+    img_button = []
     colors = ['green', 'red', 'yellow', 'blue', 'orange']
+
+    for name in colors:
+        sprite = pygame.image.load(
+            path.join('..', 'assets', "_" + name + 'button.png')).convert_alpha()
+        imgs.append(sprite)
+
     for name in colors:
         sprite = pygame.image.load(
             path.join('..', 'assets', name + 'button.png')).convert_alpha()
-        imgs.append(sprite)
+        img_button.append(sprite)
 
     for name in colors:
         sprite = pygame.image.load(
             path.join('..', 'assets', name + 'star.png')).convert_alpha()
         imgs.append(sprite)
 
-    return imgs
+    return imgs, img_button
 
 
 def create_button_list(imgs, buttons_sprites_list, difficulty=5):
@@ -151,8 +157,6 @@ def load_chart(filename, imgs, difficulty=None):
         notes = load_notes(chart_data, song, imgs, difficulty)
     else:
         notes = load_notes(chart_data, song, imgs)
-
-
 
     return song, notes
 
@@ -328,7 +332,6 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
     for n, notes_in_hit_zone in enumerate(Buttons_hit_list_by_color):
         # Eg: event.key == pygame.K_a
         # if event.key == getattr(pygame, f"K_{keys[n]}"):
-        print(n)
         if action[n]:
             if len(notes_in_hit_zone) > 0:
                 notes_in_hit_zone[0].update(True)
@@ -381,7 +384,7 @@ def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
 
 #     pygame.init()
 #     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-#     imgs = load_imgs()
+#     imgs, img_button = load_imgs()
 
 #     song, notes = load_chart(args.chart_file, imgs, args.difficulty)
 
@@ -390,7 +393,7 @@ def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
 #     visible_notes_list = pygame.sprite.Group()
 
 #     Buttons = create_button_list(
-#         imgs, buttons_sprites_list, difficulty_dict[args.difficulty])
+#         img_button, buttons_sprites_list, difficulty_dict[args.difficulty])
 
 #     for note in notes:
 #         all_notes_list.add(note)
