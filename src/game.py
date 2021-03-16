@@ -322,7 +322,7 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
         if not note in Buttons_hit_list:
 
             done = score.miss()
-            reward = -1
+            reward = -10
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
@@ -338,11 +338,11 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
                 recent_note_history.remove(notes_in_hit_zone[0])
 
                 score.hit()
-                reward = 1
+                reward = 10
             else:
                 # key was pressed but without any note
                 done = score.miss_click()
-                reward = -1
+                reward = -10
 
     # Move notes down
     all_notes_list.update()
