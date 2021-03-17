@@ -2,6 +2,8 @@ import argparse
 import re
 import sys
 import time
+import itertools as it
+import random
 from os import path
 
 import numpy as np
@@ -241,8 +243,17 @@ def load_notes(chart_data, song, imgs, difficulty='EasySingle'):
 
     # using list comprehension to create a list of all the notes
     # and parsing the required information to the Note constructor
-    notes = [Note(song, imgs, *line) for line in lines]
+    #notes = [Note(song, imgs, *line) for line in lines]
 
+    notes = []
+    actions = [list(i) for i in it.product([0, 1], repeat=5)]
+
+    for i in range(0, 1921, 48):
+        a = random.choice(actions)
+        for j in range(len(a)):
+            if a[j]:
+                notes.append(Note(song, imgs, i, 'N', j, 0))
+                    
     return notes
 
 
