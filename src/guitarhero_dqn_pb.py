@@ -25,7 +25,7 @@ IMG_WIDTH = 48
 IMG_CHANNELS = 1
 
 REPLAY_CAPACITY = 1000  # 1E6
-NUM_EPOCHS = 5
+NUM_EPOCHS = 30
 NUM_TRAIN_EPISODES = 50
 NUM_TEST_EPISODES = 1
 
@@ -194,6 +194,8 @@ if __name__ == '__main__':
     num_actions = env.action_space.n  # Muda de acordo com a dificuldade
     train_scores_list = []
     test_scores_list = []
+    train_completion_list = []
+    test_completion_list = []
     actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
     model = create_network(len(actions))
     model.summary()
@@ -223,6 +225,7 @@ if __name__ == '__main__':
 
         train_elapsed_time = time.time() - training_time
         train_completion = np.array(train_completion)
+        train_completion_list.append(train_completion.mean())
         train_scores = np.array(train_scores)
         train_scores_list.append(train_scores.mean())
         print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()),
@@ -253,6 +256,7 @@ if __name__ == '__main__':
 
         test_elapsed_time = time.time() - testing_time
         test_completion = np.array(test_completion)
+        test_completion_list.append(test_completion.mean())
         test_scores = np.array(test_scores)
         test_scores_list.append(test_scores.mean())
         print("Results: mean: %.1f±%.1f," % (test_scores.mean(), test_scores.std()),
@@ -264,6 +268,8 @@ if __name__ == '__main__':
                             "agente_final_{}".format(datetime.now().strftime("%d-%m-%Y-%H-%M"))))
     print("Train Scores: {}".format(train_scores_list))
     print("Test Scores: {}".format(test_scores_list))
+    print("Train Completion: {}".format(train_completion_list))
+    print("Test Completion: {}".format(test_completion_list))
     print("======================================")
     print("Training finished.")
 
