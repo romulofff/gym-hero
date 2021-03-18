@@ -25,7 +25,7 @@ IMG_WIDTH = 48
 IMG_CHANNELS = 1
 
 REPLAY_CAPACITY = 1000  # 1E6
-NUM_EPOCHS = 2
+NUM_EPOCHS = 5
 NUM_TRAIN_EPISODES = 50
 NUM_TEST_EPISODES = 1
 
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         train_scores = np.array(train_scores)
         train_scores_list.append(train_scores.mean())
         print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()),
-              "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max(), "Mean song accuracy: %.2f%." % train_completion.mean()*100)
+              "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max(), "Mean song accuracy: %.2f." % train_completion.mean())
 
         if epoch % 5 == 0:
             model.save(os.path.join("..", "agents",
@@ -256,7 +256,7 @@ if __name__ == '__main__':
         test_scores = np.array(test_scores)
         test_scores_list.append(test_scores.mean())
         print("Results: mean: %.1f±%.1f," % (test_scores.mean(), test_scores.std()),
-              "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max(), "Mean song accuracy: %.2f%." % test_completion.mean()*100)
+              "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max(), "Mean song accuracy: %.2f." % test_completion.mean())
 
         print("Total elapsed time: %.2f minutes" %
               ((time.time() - time_start) / 60.0))
