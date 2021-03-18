@@ -52,7 +52,7 @@ class GHEnv(gym.Env):
                                    self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock)
         observation = get_obs(self.screen, self.score,
                               self.buttons_sprites_list, self.visible_notes_list)
-        return observation, reward, self.done, {}
+        return observation, reward, self.done, {"hitted_notes_count": self.score.total_hits}
 
     def reset(self):
         """Resets the environment to an initial state and returns an initial
