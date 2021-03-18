@@ -75,7 +75,7 @@ class GHEnv(gym.Env):
         imgs, img_button = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)
-
+        self.n_notes = len(notes)
         self.all_notes_list = pygame.sprite.Group()
         self.buttons_sprites_list = pygame.sprite.Group()
         self.visible_notes_list = pygame.sprite.Group()

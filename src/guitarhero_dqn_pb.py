@@ -25,8 +25,8 @@ IMG_WIDTH = 48
 IMG_CHANNELS = 1
 
 REPLAY_CAPACITY = 1000  # 1E6
-NUM_EPOCHS = 30
-NUM_TRAIN_EPISODES = 200
+NUM_EPOCHS = 2
+NUM_TRAIN_EPISODES = 50
 NUM_TEST_EPISODES = 1
 
 BATCH_SIZE = 32
@@ -183,7 +183,7 @@ def perform_learning_step(observation, model, epoch):
 
     learn_from_memory(model)
 
-    return observation, reward, isterminal
+    return observation, reward, isterminal, info
 
 
 if __name__ == '__main__':
@@ -192,7 +192,8 @@ if __name__ == '__main__':
     replayMemory = ReplayMemory(REPLAY_CAPACITY)
 
     num_actions = env.action_space.n  # Muda de acordo com a dificuldade
-
+    train_scores_list = []
+    test_scores_list = []
     actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
     model = create_network(len(actions))
     model.summary()
@@ -204,7 +205,7 @@ if __name__ == '__main__':
 
         print("Training...")
         train_scores = []
-
+        train_completion = []
         training_time = time.time()
 
         for training_episode in trange(NUM_TRAIN_EPISODES, leave=True):
@@ -213,18 +214,19 @@ if __name__ == '__main__':
             observation = env.reset()
 
             while not done:
-                observation, reward, done = perform_learning_step(
+                observation, reward, done, info = perform_learning_step(
                     observation, model, epoch)
                 episode_reward += reward
-
+            # print("Train Completion: %.2f%" % info["hitted_notes_count"]/env.n_notes)
+            train_completion.append(info["hitted_notes_count"]/env.n_notes)
             train_scores.append(episode_reward)
 
         train_elapsed_time = time.time() - training_time
-
+        train_completion = np.array(train_completion)
         train_scores = np.array(train_scores)
-
+        train_scores_list.append(train_scores.mean())
         print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()),
-              "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max())
+              "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max(), "Mean song accuracy: %.2f%." % train_completion.mean()*100)
 
         if epoch % 5 == 0:
             model.save(os.path.join("..", "agents",
@@ -232,7 +234,7 @@ if __name__ == '__main__':
 
         print("\nTesting...")
         test_scores = []
-
+        test_completion = []
         testing_time = time.time()
 
         for testing_episode in trange(NUM_TEST_EPISODES, leave=True):
@@ -245,24 +247,29 @@ if __name__ == '__main__':
                 action = get_best_action(model, state)
                 observation, reward, done, info = env.step(actions[action])
                 episode_reward += reward
-
+            # print("Test Completion: %.2f%" % info["hitted_notes_count"]/env.n_notes)
+            test_completion.append(info["hitted_notes_count"]/env.n_notes)
             test_scores.append(episode_reward)
 
         test_elapsed_time = time.time() - testing_time
-
+        test_completion = np.array(test_completion)
         test_scores = np.array(test_scores)
-
+        test_scores_list.append(test_scores.mean())
         print("Results: mean: %.1f±%.1f," % (test_scores.mean(), test_scores.std()),
-              "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max())
+              "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max(), "Mean song accuracy: %.2f%." % test_completion.mean()*100)
 
         print("Total elapsed time: %.2f minutes" %
               ((time.time() - time_start) / 60.0))
     model.save(os.path.join("..", "agents",
                             "agente_final_{}".format(datetime.now().strftime("%d-%m-%Y-%H-%M"))))
-
+    print("Train Scores: {}".format(train_scores_list))
+    print("Test Scores: {}".format(test_scores_list))
     print("======================================")
     print("Training finished.")
 
     env.close()
 
+    plt.plot(np.array(train_scores_list))
+    plt.plot(np.array(test_scores_list))
+    plt.show()
 f.close()
