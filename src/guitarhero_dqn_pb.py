@@ -14,8 +14,6 @@ from skimage.io import imsave
 from skimage.transform import resize
 from skimage.util import crop
 from tensorflow.keras import layers
-from tensorflow.keras.layers import Conv2D, Dense, Flatten
-from tensorflow.keras.models import Sequential
 from tqdm import trange
 
 import gh_env
@@ -24,10 +22,10 @@ IMG_HEIGHT = 54
 IMG_WIDTH = 48
 IMG_CHANNELS = 1
 
-REPLAY_CAPACITY = 1000  # 1E6
-NUM_EPOCHS = 30
-NUM_TRAIN_EPISODES = 50
-NUM_TEST_EPISODES = 1
+REPLAY_CAPACITY = 100000  # 1E6
+NUM_EPOCHS = 20
+NUM_TRAIN_EPISODES = 200
+NUM_TEST_EPISODES = 100
 
 BATCH_SIZE = 32
 
@@ -55,7 +53,6 @@ def preprocess(image):  # color 210 x 160
     preproc_img = crop(preproc_img, ((150), (0)))
     preproc_img = resize(preproc_img, output_shape=(
         IMG_WIDTH, IMG_HEIGHT), anti_aliasing=False)  # 110 x 84
-    # imsave("images/preproc.png", preproc_img)
     return preproc_img
 
 
@@ -121,7 +118,7 @@ def get_q_values(model, state):
 def get_best_action(model, state):
     s = state.reshape([1, IMG_WIDTH, IMG_HEIGHT, 1])
     v = get_q_values(model, s)
-    print(v, file=f)
+    # print(v, file=f)
     return tf.argmax(v[0])
 
 

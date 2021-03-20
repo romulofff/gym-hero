@@ -70,6 +70,7 @@ class GHEnv(gym.Env):
 
         self.done = False
         pygame.init()
+        pygame.display.set_caption('Gym Hero')
         # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         imgs, img_button = load_imgs()
