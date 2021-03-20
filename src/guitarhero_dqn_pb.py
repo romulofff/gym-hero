@@ -1,7 +1,8 @@
-import os
 import itertools as it
+import os
+import time
+from datetime import datetime
 from random import randint, random, sample
-from time import sleep, time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,21 +14,18 @@ from skimage.io import imsave
 from skimage.transform import resize
 from skimage.util import crop
 from tensorflow.keras import layers
-from tensorflow.keras.layers import Conv2D, Dense, Flatten
-from tensorflow.keras.models import Sequential
 from tqdm import trange
 
 import gh_env
 
-
-IMG_HEIGHT = 45
-IMG_WIDTH = 40
+IMG_HEIGHT = 54
+IMG_WIDTH = 48
 IMG_CHANNELS = 1
 
-REPLAY_CAPACITY = 1000  # 1E6
-NUM_EPOCHS = 10
+REPLAY_CAPACITY = 100000  # 1E6
+NUM_EPOCHS = 20
 NUM_TRAIN_EPISODES = 200
-NUM_TEST_EPISODES = 1
+NUM_TEST_EPISODES = 100
 
 BATCH_SIZE = 32
 
@@ -52,7 +50,7 @@ if gpus:
 
 def preprocess(image):  # color 210 x 160
     preproc_img = color.rgb2gray(image)  # gray 210 x 160
-    preproc_img = crop(preproc_img, ((75), (0)))
+    preproc_img = crop(preproc_img, ((150), (0)))
     preproc_img = resize(preproc_img, output_shape=(
         IMG_WIDTH, IMG_HEIGHT), anti_aliasing=False)  # 110 x 84
     return preproc_img
@@ -120,9 +118,9 @@ def get_q_values(model, state):
 def get_best_action(model, state):
     s = state.reshape([1, IMG_WIDTH, IMG_HEIGHT, 1])
     v = get_q_values(model, s)
-    print(v, file=f)
+    # print(v, file=f)
     return tf.argmax(v[0])
-            
+
 
 def learn_from_memory(model):
     """ Learns from a single transition (making use of replay memory).
@@ -136,10 +134,11 @@ def learn_from_memory(model):
         target_q = get_q_values(model, s1)
         # target differs from q only for the selected action. The following means:
         # target_Q(s,a) = r + gamma * max Q(s2,_) if not isterminal else r
-        target_q[np.arange(target_q.shape[0]), a] = r + discount_factor * (1 - isterminal) * q2        
+        target_q[np.arange(target_q.shape[0]), a] = r + \
+            discount_factor * (1 - isterminal) * q2
         learn(model, s1, target_q)
-        
-        
+
+
 def perform_learning_step(observation, model, epoch):
     """ Makes an action according to eps-greedy policy, observes the result
     (next state, reward) and learns from the transition"""
@@ -156,7 +155,8 @@ def perform_learning_step(observation, model, epoch):
         elif epoch < eps_decay_epochs:
             # Linear decay
             return start_eps - (epoch - const_eps_epochs) / \
-                               (eps_decay_epochs - const_eps_epochs) * (start_eps - end_eps)
+                               (eps_decay_epochs - const_eps_epochs) * \
+                (start_eps - end_eps)
         else:
             return end_eps
 
@@ -164,13 +164,13 @@ def perform_learning_step(observation, model, epoch):
 
     # With probability eps make a random action.
     eps = exploration_rate(epoch)
-    
+
     if random() <= eps:
         a = randint(0, len(actions) - 1)
     else:
         # Choose the best action according to the network.
         a = get_best_action(model, s1)
-        
+
     observation, reward, isterminal, info = env.step(actions[a])
 
     s2 = preprocess(observation) if not isterminal else None
@@ -180,8 +180,8 @@ def perform_learning_step(observation, model, epoch):
 
     learn_from_memory(model)
 
-    return observation, reward, isterminal
-    
+    return observation, reward, isterminal, info
+
 
 if __name__ == '__main__':
 
@@ -189,76 +189,97 @@ if __name__ == '__main__':
     replayMemory = ReplayMemory(REPLAY_CAPACITY)
 
     num_actions = env.action_space.n  # Muda de acordo com a dificuldade
-
-
+    train_scores_list = []
+    test_scores_list = []
+    train_completion_list = []
+    test_completion_list = []
     actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
     model = create_network(len(actions))
     model.summary()
 
+    time_start = time.time()
 
-    time_start = time()
-    
     for epoch in range(NUM_EPOCHS):
         print("\nEpoch %d\n-------" % (epoch + 1))
 
         print("Training...")
         train_scores = []
-        
-        training_time = time()
-            
+        train_completion = []
+        training_time = time.time()
+
         for training_episode in trange(NUM_TRAIN_EPISODES, leave=True):
             episode_reward = 0.0
             done = False
             observation = env.reset()
-            
+
             while not done:
-                observation, reward, done = perform_learning_step(observation, model, epoch)
+                observation, reward, done, info = perform_learning_step(
+                    observation, model, epoch)
                 episode_reward += reward
-
+            # print("Train Completion: %.2f%" % info["hitted_notes_count"]/env.n_notes)
+            train_completion.append(info["hitted_notes_count"]/env.n_notes)
             train_scores.append(episode_reward)
-            
-        train_elapsed_time = time() - training_time
-        
+
+        train_elapsed_time = time.time() - training_time
+        train_completion = np.array(train_completion)
+        train_completion_list.append(train_completion.mean())
         train_scores = np.array(train_scores)
-        
-        print("Results: mean: %.1f±%.1f," %(train_scores.mean(), train_scores.std()), \
-                "min: %.1f," %train_scores.min(), "max: %.1f," %train_scores.max())
+        train_scores_list.append(train_scores.mean())
+        print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()),
+              "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max(), "Mean song accuracy: %.2f." % train_completion.mean())
 
-        #if episode % 5 == 0:
-        #    model.save(os.path.join("..", "agents",
-        #                            "agente_ep_{}_{}".format(episode, time())))
-
+        if epoch % 5 == 0:
+            model.save(os.path.join("..", "agents",
+                                    "agente_epoch_{}_{}".format(epoch, datetime.now().strftime("%d-%m-%Y-%H-%M"))))
 
         print("\nTesting...")
         test_scores = []
-    
-        testing_time = time()
-        
+        test_completion = []
+        testing_time = time.time()
+
         for testing_episode in trange(NUM_TEST_EPISODES, leave=True):
             episode_reward = 0.0
             done = False
             observation = env.reset()
-            
+
             while not done:
                 state = preprocess(observation)
                 action = get_best_action(model, state)
                 observation, reward, done, info = env.step(actions[action])
                 episode_reward += reward
-                
+            # print("Test Completion: %.2f%" % info["hitted_notes_count"]/env.n_notes)
+            test_completion.append(info["hitted_notes_count"]/env.n_notes)
             test_scores.append(episode_reward)
-        
-        test_elapsed_time = time() - testing_time
-        
-        test_scores = np.array(test_scores)
-        
-        print("Results: mean: %.1f±%.1f," % (test_scores.mean(), test_scores.std()), \
-                "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max())
-        
-        print("Total elapsed time: %.2f minutes" % ((time() - time_start) / 60.0))
 
+        test_elapsed_time = time.time() - testing_time
+        test_completion = np.array(test_completion)
+        test_completion_list.append(test_completion.mean())
+        test_scores = np.array(test_scores)
+        test_scores_list.append(test_scores.mean())
+        print("Results: mean: %.1f±%.1f," % (test_scores.mean(), test_scores.std()),
+              "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max(), "Mean song accuracy: %.2f." % test_completion.mean())
+
+        print("Total elapsed time: %.2f minutes" %
+              ((time.time() - time_start) / 60.0))
+    model.save(os.path.join("..", "agents",
+                            "agente_final_{}".format(datetime.now().strftime("%d-%m-%Y-%H-%M"))))
+    print("Train Scores: {}".format(train_scores_list))
+    print("Test Scores: {}".format(test_scores_list))
+    print("Train Completion: {}".format(train_completion_list))
+    print("Test Completion: {}".format(test_completion_list))
     print("======================================")
     print("Training finished.")
 
     env.close()
-    
+
+    plt.plot(np.array(train_scores_list))
+    plt.plot(np.array(test_scores_list))
+    plt.show()
+    plt.plot(np.array(train_completion_list))
+    plt.plot(np.array(test_completion_list))
+    plt.show()
+    plt.bar(range(len(train_completion_list)), np.array(train_completion_list))
+    plt.show()
+    plt.bar(range(len(test_completion_list)), np.array(test_completion_list))
+    plt.show()
 f.close()

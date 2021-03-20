@@ -2,6 +2,8 @@ import argparse
 import re
 import sys
 import time
+import itertools as it
+import random
 from os import path
 
 import numpy as np
@@ -241,8 +243,17 @@ def load_notes(chart_data, song, imgs, difficulty='EasySingle'):
 
     # using list comprehension to create a list of all the notes
     # and parsing the required information to the Note constructor
-    notes = [Note(song, imgs, *line) for line in lines]
+    #notes = [Note(song, imgs, *line) for line in lines]
 
+    notes = []
+    actions = [list(i) for i in it.product([0, 1], repeat=5)]
+
+    for i in range(0, 1921, 48):
+        a = random.choice(actions)
+        for j in range(len(a)):
+            if a[j]:
+                notes.append(Note(song, imgs, i, 'N', j, 0))
+                    
     return notes
 
 
@@ -322,7 +333,7 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
         if not note in Buttons_hit_list:
 
             done = score.miss()
-            reward = -1
+            reward = -10
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
@@ -338,11 +349,11 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
                 recent_note_history.remove(notes_in_hit_zone[0])
 
                 score.hit()
-                reward = 1
+                reward = 10
             else:
                 # key was pressed but without any note
                 done = score.miss_click()
-                reward = -1
+                reward = -10
 
     # Move notes down
     all_notes_list.update()

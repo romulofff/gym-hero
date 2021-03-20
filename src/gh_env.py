@@ -52,7 +52,7 @@ class GHEnv(gym.Env):
                                    self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock)
         observation = get_obs(self.screen, self.score,
                               self.buttons_sprites_list, self.visible_notes_list)
-        return observation, reward, self.done, {}
+        return observation, reward, self.done, {"hitted_notes_count": self.score.total_hits}
 
     def reset(self):
         """Resets the environment to an initial state and returns an initial
@@ -70,12 +70,13 @@ class GHEnv(gym.Env):
 
         self.done = False
         pygame.init()
+        pygame.display.set_caption('Gym Hero')
         # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         imgs, img_button = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)
-
+        self.n_notes = len(notes)
         self.all_notes_list = pygame.sprite.Group()
         self.buttons_sprites_list = pygame.sprite.Group()
         self.visible_notes_list = pygame.sprite.Group()

@@ -4,7 +4,7 @@ class Score():
         self.x_pos = 100
         self.font_size = 25
         self.decrease_mode = decrease_mode
-
+        self.total_hits = 0
         # The ammount of notes correctly hit in a row
         self._counter = 0
 
@@ -13,7 +13,7 @@ class Score():
     def hit(self, value=10):
         self._counter = min(self._counter + 1, 39)
         self.value += value * self.multiplier
-
+        self.total_hits += 1
         self.rock_meter = min(self.rock_meter + 2, 100)
 
     def miss(self):
