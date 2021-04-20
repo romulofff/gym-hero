@@ -48,5 +48,12 @@ A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o 
 - Instalação via pip
 - Modo multiplayer
 
+### Requisitos pro Paper:
+- Desligar a renderização (só o hidden msm)
+- Modo jogador e modo IA
+- Modificar as texturas facilmente (pode ser mudando os arquivos nas pastas msm)
+- Arquivo configurações ambiente (recompensa, score, multiplicador...)
+- Instalar usando pip
+
 
 <!-- - [Subreddit do Clone Hero](https://www.reddit.com/r/CloneHero/comments/7caylm/how_to_install_clone_hero_and_all_the_files_you/) -->
