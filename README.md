@@ -9,6 +9,8 @@ The experiments evaluated a set of 3 autonomous agents trained in this environme
 
 The agents trained on Easy and Medium levels were capable of learning the expected behaviors to play the game. However, the agent trained on the Expert level could not learn the adequate behavior to beat this level. The obtained results validate the proposed environment as capable of evaluating autonomous agents on reinforcement learning tasks.
 
+![This is the Gym Hero game](assets/gym-hero.png)
+
 ## How to run it:
 After cloning the repository, enter the project folder and type the following commands on the terminal
 ```
