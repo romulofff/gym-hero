@@ -5,7 +5,7 @@ import gym
 from game import *
 
 
-class GHEnv(gym.Env):
+class GymHeroEnv(gym.Env):
 
     def __init__(self):
         self.difficulty_dict = {
@@ -99,7 +99,7 @@ class GHEnv(gym.Env):
 if __name__ == '__main__':
     print("Start")
     start_time = time.time()
-    env = GHEnv()
+    env = GymHeroEnv()
     env.reset()
 
     done = False

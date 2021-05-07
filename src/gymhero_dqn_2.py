@@ -17,7 +17,7 @@ from tensorflow.keras.layers import Conv2D, Dense, Flatten
 from tensorflow.keras.models import Sequential
 from tqdm import trange
 
-import gh_env
+import gymhero_env
 
 dropout_prob = 0.3
 
@@ -120,7 +120,7 @@ BATCH_SIZE = 2
 discount_factor = 0.99
 
 
-env = gh_env.GHEnv()
+env = gymhero_env.GymHeroEnv()
 replayMemory = ReplayMemory(REPLAY_CAPACITY)
 
 done = False

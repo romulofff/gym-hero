@@ -23,9 +23,9 @@ IMG_WIDTH = 48
 IMG_CHANNELS = 1
 
 REPLAY_CAPACITY = 100000  # 1E6
-NUM_EPOCHS = 20
+NUM_EPOCHS = 1
 NUM_TRAIN_EPISODES = 200
-NUM_TEST_EPISODES = 100
+NUM_TEST_EPISODES = 40
 
 BATCH_SIZE = 32
 
@@ -194,43 +194,15 @@ if __name__ == '__main__':
     train_completion_list = []
     test_completion_list = []
     actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
-    model = create_network(len(actions))
+    # "agents\\Agente Chart Aleatorio Easy 20 Epocas 200 Eps 100 Test\\agente_final_19-03-2021-03-20"
+    # model = keras.models.load_model('../agents/agente_final_19-03-2021-03-20')
+    model = keras.models.load_model("../agents\\Agente Chart Aleatorio Easy 20 Epocas 200 Eps 100 Test\\agente_final_19-03-2021-03-20")
     model.summary()
 
     time_start = time.time()
 
     for epoch in range(NUM_EPOCHS):
         print("\nEpoch %d\n-------" % (epoch + 1))
-
-        print("Training...")
-        train_scores = []
-        train_completion = []
-        training_time = time.time()
-
-        for training_episode in trange(NUM_TRAIN_EPISODES, leave=True):
-            episode_reward = 0.0
-            done = False
-            observation = env.reset()
-
-            while not done:
-                observation, reward, done, info = perform_learning_step(
-                    observation, model, epoch)
-                episode_reward += reward
-            # print("Train Completion: %.2f%" % info["hitted_notes_count"]/env.n_notes)
-            train_completion.append(info["hitted_notes_count"]/env.n_notes)
-            train_scores.append(episode_reward)
-
-        train_elapsed_time = time.time() - training_time
-        train_completion = np.array(train_completion)
-        train_completion_list.append(train_completion.mean())
-        train_scores = np.array(train_scores)
-        train_scores_list.append(train_scores.mean())
-        print("Results: mean: %.1f±%.1f," % (train_scores.mean(), train_scores.std()),
-              "min: %.1f," % train_scores.min(), "max: %.1f," % train_scores.max(), "Mean song accuracy: %.2f." % train_completion.mean())
-
-        if epoch % 5 == 0:
-            model.save(os.path.join("..", "agents",
-                                    "agente_epoch_{}_{}".format(epoch, datetime.now().strftime("%d-%m-%Y-%H-%M"))))
 
         print("\nTesting...")
         test_scores = []
@@ -256,17 +228,7 @@ if __name__ == '__main__':
         test_completion_list.append(test_completion.mean())
         test_scores = np.array(test_scores)
         test_scores_list.append(test_scores.mean())
-        print("Results: mean: %.1f±%.1f," % (test_scores.mean(), test_scores.std()),
-              "min: %.1f" % test_scores.min(), "max: %.1f" % test_scores.max(), "Mean song accuracy: %.2f." % test_completion.mean())
-
-        print("Total elapsed time: %.2f minutes" %
-              ((time.time() - time_start) / 60.0))
-    model.save(os.path.join("..", "agents",
-                            "agente_final_{}".format(datetime.now().strftime("%d-%m-%Y-%H-%M"))))
-    print("Train Scores: {}".format(train_scores_list))
-    print("Test Scores: {}".format(test_scores_list))
-    print("Train Completion: {}".format(train_completion_list))
-    print("Test Completion: {}".format(test_completion_list))
+        
     print("======================================")
     print("Training finished.")
 

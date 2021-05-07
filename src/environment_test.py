@@ -1,7 +1,7 @@
 import numpy as np
-import gh_env
+import gymhero_env
 
-env = gh_env.GHEnv()
+env = gymhero_env.GymHeroEnv()
 obs = env.reset()
 done = False
 total_reward = 0.0

@@ -13,11 +13,11 @@ from tensorflow.keras.layers import Conv2D, Dense, Flatten
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.keras.layers.core import Flatten
 
-import gh_env
+import gymhero_env
 
 print("Num GPUs Available: ", len(list_physical_devices('GPU')))
 
-enviroment = gh_env.GHEnv()
+enviroment = gymhero_env.GymHeroEnv()
 # enviroment.render()
 
 # print('Number of states: {}'.format(enviroment.observation_space))
