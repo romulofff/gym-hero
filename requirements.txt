@@ -62,6 +62,6 @@ toml==0.10.1
 tqdm==4.59.0
 typed-ast==1.4.1
 typing-extensions==3.7.4.3
-urllib3==1.26.3
+urllib3==1.26.4
 Werkzeug==1.0.1
 wrapt==1.12.1
