@@ -81,7 +81,7 @@ class GymHeroEnv(gym.Env):
                 (SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         imgs, img_button = load_imgs()
 
-        self.song, notes = load_chart(self.args.chart_file, imgs)
+        self.song, notes = load_chart(self.args.chart_file, imgs, difficulty=self.args.difficulty)
         self.n_notes = len(notes)
         self.all_notes_list = pygame.sprite.Group()
         self.buttons_sprites_list = pygame.sprite.Group()

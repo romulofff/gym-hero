@@ -29,6 +29,12 @@ PIXELS_PER_BEAT = 400
 
 color_x_pos = [163, 227, 291, 355, 419]
 
+difficulty_dict = {
+    "Easy":3,
+    "Medium":4,
+    "Hard":5,
+    "Expert":5
+}
 
 class Note(pygame.sprite.Sprite):
     def __init__(self, song, imgs, start=0, note_type='N', color=None, duration=0):
@@ -250,7 +256,7 @@ def load_notes(chart_data, song, imgs, difficulty='EasySingle'):
     #notes = [Note(song, imgs, *line) for line in lines]
 
     notes = []
-    actions = [list(i) for i in it.product([0, 1], repeat=5)]
+    actions = [list(i) for i in it.product([0, 1], repeat=difficulty_dict[difficulty])]
 
     for i in range(0, 1921, 48):
         a = random.choice(actions)
