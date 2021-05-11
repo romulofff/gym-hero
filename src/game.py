@@ -102,8 +102,11 @@ def arg_parser():
     parser.add_argument('--human', action='store_true',
                         help='enables human controls through keyboard.')
     parser.add_argument('-d',
-        '--difficulty', help='choose game difficulty (Easy, Medium, Hard, Expert)')
-    parser.add_argument('-s', '--screen', action='store_true', help='enable the game monitoring during training.')
+                        '--difficulty', help='choose game difficulty (Easy, Medium, Hard, Expert)')
+    parser.add_argument('-s', '--screen', action='store_true',
+                        help='enable the game monitoring during training.')
+    parser.add_argument(
+        '--config', help='file containing settings for reward and score.')
     return parser.parse_args()
 
 
@@ -254,7 +257,7 @@ def load_notes(chart_data, song, imgs, difficulty='EasySingle'):
         for j in range(len(a)):
             if a[j]:
                 notes.append(Note(song, imgs, i, 'N', j, 0))
-                    
+
     return notes
 
 
@@ -298,7 +301,7 @@ recent_note_history = []
 # TODO: separar handle input do update
 
 
-def update(score, ticks, action, song, visible_notes_list, all_notes_list, Buttons, clock):
+def update(score, ticks, action, song, visible_notes_list, all_notes_list, Buttons, clock, reward_value):
     global recent_note_history
     reward = 0.0
     done = False
@@ -334,7 +337,7 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
         if not note in Buttons_hit_list:
 
             done = score.miss()
-            reward = -10
+            reward = -reward_value
             recent_note_history.remove(note)
     # Finished unoptimized unpressed notes detection:
 
@@ -350,11 +353,11 @@ def update(score, ticks, action, song, visible_notes_list, all_notes_list, Butto
                 recent_note_history.remove(notes_in_hit_zone[0])
 
                 score.hit()
-                reward = 10
+                reward = reward_value
             else:
                 # key was pressed but without any note
                 done = score.miss_click()
-                reward = -10
+                reward = -reward_value
 
     # Move notes down
     all_notes_list.update()

@@ -1,5 +1,5 @@
 import time
-
+import json
 import gym
 
 from game import *
@@ -19,6 +19,8 @@ class GymHeroEnv(gym.Env):
             self.difficulty_dict[self.args.difficulty])
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(
             SCREEN_WIDTH, SCREEN_HEIGHT, 3), dtype=np.uint8)
+        with open(self.args.config) as f:
+            self.config = json.load(f)
         self.done = False
 
     def step(self, action):
@@ -49,7 +51,7 @@ class GymHeroEnv(gym.Env):
             action_vec[action] = True
         # print(action_vec)
         self.done, reward = update(self.score, 0, action_vec, self.song,
-                                   self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock)
+                                   self.visible_notes_list, self.all_notes_list, self.Buttons, self.clock, self.config['reward'])
         observation = get_obs(self.screen, self.score,
                               self.buttons_sprites_list, self.visible_notes_list)
         return observation, reward, self.done, {"hitted_notes_count": self.score.total_hits}
@@ -72,9 +74,11 @@ class GymHeroEnv(gym.Env):
         pygame.init()
         pygame.display.set_caption('Gym Hero')
         if self.args.screen:
-            self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+            self.screen = pygame.display.set_mode(
+                (SCREEN_WIDTH, SCREEN_HEIGHT))
         else:
-            self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
+            self.screen = pygame.display.set_mode(
+                (SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         imgs, img_button = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)
@@ -90,7 +94,8 @@ class GymHeroEnv(gym.Env):
             self.all_notes_list.add(note)
             # buttons_sprites_list.add(note)
 
-        self.score = Score(decrease_mode=self.args.decrease_score)
+        self.score = Score(
+            decrease_mode=self.args.decrease_score, points=self.config['points'])
         self.clock = pygame.time.Clock()
         return get_obs(self.screen, self.score, self.buttons_sprites_list, self.visible_notes_list)
 
