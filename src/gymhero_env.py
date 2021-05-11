@@ -71,8 +71,10 @@ class GymHeroEnv(gym.Env):
         self.done = False
         pygame.init()
         pygame.display.set_caption('Gym Hero')
-        # self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        if self.args.screen:
+            self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        else:
+            self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), flags=pygame.HIDDEN)
         imgs, img_button = load_imgs()
 
         self.song, notes = load_chart(self.args.chart_file, imgs)

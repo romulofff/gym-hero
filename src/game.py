@@ -97,12 +97,13 @@ def arg_parser():
     parser.add_argument(
         "chart_file",
         help="Path to .CHART file.")
-    parser.add_argument('-d', '--decrease_score', action='store_true',
+    parser.add_argument('--decrease_score', action='store_true',
                         help='enables the feature of decreasing the score for mistakes.')
     parser.add_argument('--human', action='store_true',
                         help='enables human controls through keyboard.')
-    parser.add_argument(
+    parser.add_argument('-d',
         '--difficulty', help='choose game difficulty (Easy, Medium, Hard, Expert)')
+    parser.add_argument('-s', '--screen', action='store_true', help='enable the game monitoring during training.')
     return parser.parse_args()
 
 
