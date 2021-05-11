@@ -196,7 +196,8 @@ if __name__ == '__main__':
     actions = [list(a) for a in it.product([0, 1], repeat=num_actions)]
     # "agents\\Agente Chart Aleatorio Easy 20 Epocas 200 Eps 100 Test\\agente_final_19-03-2021-03-20"
     # model = keras.models.load_model('../agents/agente_final_19-03-2021-03-20')
-    model = keras.models.load_model("../agents\\Agente Chart Aleatorio Easy 20 Epocas 200 Eps 100 Test\\agente_final_19-03-2021-03-20")
+    model = keras.models.load_model(
+        "../agents\\Agente Chart Aleatorio Easy 20 Epocas 200 Eps 100 Test\\agente_final_19-03-2021-03-20")
     model.summary()
 
     time_start = time.time()
@@ -228,7 +229,7 @@ if __name__ == '__main__':
         test_completion_list.append(test_completion.mean())
         test_scores = np.array(test_scores)
         test_scores_list.append(test_scores.mean())
-        
+
     print("======================================")
     print("Training finished.")
 

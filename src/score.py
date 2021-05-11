@@ -10,7 +10,6 @@ class Score():
         self.rock_meter = 50
         self.points = points
 
-
     def hit(self):
         self._counter = min(self._counter + 1, 39)
         self.value += self.points * self.multiplier

@@ -1,5 +1,5 @@
-import os
 import itertools as it
+import os
 from random import randint, random, sample
 from time import sleep, time
 

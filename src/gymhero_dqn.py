@@ -1,8 +1,8 @@
-import matplotlib.pyplot as plt
 import random
 import time
 from collections import deque
 
+import matplotlib.pyplot as plt
 import numpy as np
 import progressbar
 import tensorflow.keras as keras
@@ -111,6 +111,7 @@ def preprocess(image):
     preproc = resize(image, output_shape=(192, 216, 3))
     return preproc
 
+
 optimizer = Adam(learning_rate=0.01)
 agent = Agent(enviroment, optimizer)
 
@@ -174,7 +175,7 @@ for e in range(0, num_of_episodes):
         # enviroment.render()
         print("**********************************")
     print("Episode {} had {} steps and trained in {} seconds.".format(e,
-        timestep, time.time()-start_episode_time))
+                                                                      timestep, time.time()-start_episode_time))
 
 print("Training done in {} seconds.".format(time.time()-start_time))
 agent.save_training()
