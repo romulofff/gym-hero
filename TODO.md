@@ -49,7 +49,7 @@ A torcida no Guitar Hero original era a sua "vida", se o jogador errar muito, o 
 - Modo multiplayer
 
 ### Requisitos pro Paper:
-- Desligar a renderização (só o hidden msm)
+- Desligar a renderização (só o hidden msm) --> **OK**
 - Modo jogador e modo IA
 - Modificar as texturas facilmente (pode ser mudando os arquivos nas pastas msm)
 - Arquivo configurações ambiente (recompensa, score, multiplicador...)
