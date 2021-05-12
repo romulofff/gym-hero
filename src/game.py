@@ -389,7 +389,7 @@ def get_obs(screen, score, buttons_sprites_list, visible_notes_list):
 #     global done
 #     reward = 0
 #     done, reward = update(score, ticks, action, song,
-#                           visible_notes_list, all_notes_list, Buttons, clock)
+#                           visible_notes_list, all_notes_list, Buttons, clock, 10)
 #     observation = get_obs(screen, score, buttons_sprites_list, visible_notes_list)
 #     return observation, reward, done, {}
 
