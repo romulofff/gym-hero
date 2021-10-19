@@ -1,5 +1,5 @@
 # Gym Hero
-This repository contains code used on the experiments of my undergraduate thesis for my B.S in Computer Engineering.
+This repository contains code used on the experiments of my undergraduate thesis for my B.S in Computer Engineering. Paper presenting the enviroment was presented in SBGames 2021 and can be seen [here](https://www.sbgames.org/proceedings2021/ComputacaoFull/217884.pdf).
 
 ## Description:
 
