@@ -29,7 +29,7 @@ matplotlib==3.3.4
 mccabe==0.6.1
 mido==1.2.9
 networkx==2.5
-numpy==1.21.0
+numpy==1.22.0
 oauthlib==3.1.0
 opt-einsum==3.3.0
 pefile==2019.4.18
