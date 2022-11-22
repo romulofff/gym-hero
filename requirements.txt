@@ -33,7 +33,7 @@ numpy==1.22.0
 oauthlib==3.1.0
 opt-einsum==3.3.0
 pefile==2019.4.18
-Pillow==9.0.1
+Pillow==9.3.0
 progressbar==2.5
 protobuf==3.18.3
 pyasn1==0.4.8
